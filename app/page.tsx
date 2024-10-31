@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import { 
   PlayCircle, 
   StopCircle, 
-  Heart,
+  Infinity,
   Undo,
   FastForward,
   Rewind,
@@ -133,7 +133,7 @@ export default function Home() {
         onClick={() => setIsPlaying(false)}
         className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center text-white hover:from-red-400 hover:to-red-500 transition-all duration-300 shadow-lg border border-red-400/30 hover:scale-110 active:scale-95"
       >
-        <Heart className="w-6 h-6 sm:w-8 sm:h-8" />
+        <Infinity className="w-6 h-6 sm:w-8 sm:h-8" />
       </button>
 
       </div>
