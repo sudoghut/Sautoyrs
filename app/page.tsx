@@ -10,6 +10,7 @@ import {
   Rewind,
   Settings
 } from 'lucide-react';
+import { CreateMLCEngine } from "@mlc-ai/web-llm";
 
 interface Message {
   id: number;
@@ -19,6 +20,33 @@ interface Message {
 }
 
 export default function Home() {
+
+  // const appConfig = {
+  //   "model_list": [
+  //     {
+  //       "model": "/url/to/my/llama",
+  //       "model_id": "MyLlama-3b-v1-q4f32_0",
+  //       "model_lib": "/url/to/myllama3b.wasm",
+  //     }
+  //   ],
+  // };
+  // // override default
+  // const chatOpts = {
+  //   "repetition_penalty": 1.01
+  // };
+
+  // // load a prebuilt model
+  // // with a chat option override and app config
+  // // under the hood, it will load the model from myLlamaUrl
+  // // and cache it in the browser cache
+  // // The chat will also load the model library from "/url/to/myllama3b.wasm",
+  // // assuming that it is compatible to the model in myLlamaUrl.
+  // const engine = await CreateMLCEngine(
+  //   "MyLlama-3b-v1-q4f32_0",
+  //   { appConfig }, // engineConfig
+  //   chatOpts,
+  // );
+
   const [messages, setMessages] = useState<Message[]>([
     { id: 1, speaker: 'Character 1', text: 'Hi there! How are you today?', timestamp: '0:00' },
     { id: 2, speaker: 'Character 2', text: 'I\'m doing great! Just enjoying this lovely weather.', timestamp: '0:05' }
