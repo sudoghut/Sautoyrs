@@ -10,66 +10,122 @@ import {
   Rewind,
   Settings
 } from 'lucide-react';
-import { CreateMLCEngine } from "@mlc-ai/web-llm";
+import * as webllm from "@mlc-ai/web-llm";
+
+function setLabel(id: string, text: string) {
+  const label = document.getElementById(id);
+  if (label == null) {
+    throw Error("Cannot find label " + id);
+  }
+  label.innerText = text;
+}
+const [isPlaying, setIsPlaying] = useState(false);
+const [pace, setPace] = useState(1);
+
+const scrollRef = useRef<HTMLDivElement | null>(null);
 
 interface Message {
   id: number;
-  speaker: string;
-  text: string;
+  role: string;
+  content: string;
   timestamp: string;
 }
 
 export default function Home() {
+  let isRunning = useRef(false);
+  let chatThread = useRef<Message[]>([]);
+  let engineRef = useRef<webllm.MLCEngineInterface | null>(null);
+  const initializeWebLLMEngine = async (selectedModel: string, modelLib: string, modelUrl: string, llmTemp: number, llmTopP: number): Promise<webllm.MLCEngineInterface | null> => {
+    if (isRunning.current) {
+      return null;
+    }
+    isRunning.current = true;
+    const initProgressCallback = (report: webllm.InitProgressReport) => {
+      setLabel("init-label", report.text);
+    };
+    // const selectedModel = "magnum-v4-9b-q4f16_1-MLC";
+    const appConfig: webllm.AppConfig = {
+      model_list: [
+        {
+          model: modelUrl,
+          // model: "https://huggingface.co/oopus/magnum-v4-12b-MLC",
+          model_id: selectedModel,
+          model_lib: modelLib,
+            // "https://huggingface.co/oopus/magnum-v4-12b-MLC/resolve/main/magnum-v4-12b-q4f16_1-webgpu.wasm",
+        },
+      ],
+    };
+    const engine: webllm.MLCEngineInterface = await webllm.CreateMLCEngine(
+      selectedModel,
+      { appConfig: appConfig, initProgressCallback: initProgressCallback,
+        logLevel: "INFO",
+      },
+      // {
+      //   context_window_size: 2048,
+      //   // sliding_window_size: 1024,
+      //   // attention_sink_size: 4,
+      // },
 
-  // const appConfig = {
-  //   "model_list": [
-  //     {
-  //       "model": "/url/to/my/llama",
-  //       "model_id": "MyLlama-3b-v1-q4f32_0",
-  //       "model_lib": "/url/to/myllama3b.wasm",
-  //     }
-  //   ],
-  // };
-  // // override default
-  // const chatOpts = {
-  //   "repetition_penalty": 1.01
-  // };
+    );
+    return engine;
+  }
 
-  // // load a prebuilt model
-  // // with a chat option override and app config
-  // // under the hood, it will load the model from myLlamaUrl
-  // // and cache it in the browser cache
-  // // The chat will also load the model library from "/url/to/myllama3b.wasm",
-  // // assuming that it is compatible to the model in myLlamaUrl.
-  // const engine = await CreateMLCEngine(
-  //   "MyLlama-3b-v1-q4f32_0",
-  //   { appConfig }, // engineConfig
-  //   chatOpts,
-  // );
+  async function runLLMEngine (modelName: string, modelLib: string, modelUrl: string) {
+    if (isRunning.current) {
+      return;
+    }
+    isRunning.current = true;
+    let engine: webllm.MLCEngineInterface | null = null;
+    if (engineRef.current === null) {
+      const engine = await initializeWebLLMEngine(modelName, modelLib, modelUrl, 0.5, 0.9);
+      if (engine !== null) {
+        engineRef.current = engine;
+      }
+    }
+    if (engine ! == null) {
+      const reply0 = await engine!.chat.completions.create({
+        messages: [{ role: "user", content: "List three US states." }],
+        stream: true,
+        stream_options: { include_usage: true },
+    });
+    // 记得一轮运行完成之后 isRunning.current = false;
+    for await (const chunk of reply0) {
+      console.log("1-5 Chunk...");
+      try {
+        const curDelta = chunk.choices[0]?.delta.content;
+        console.log(curDelta);
+      } catch (e) {
+        // console.log(e);
+      }
+    }
+  }
+  }
 
-  const [messages, setMessages] = useState<Message[]>([
-    { id: 1, speaker: 'Character 1', text: 'Hi there! How are you today?', timestamp: '0:00' },
-    { id: 2, speaker: 'Character 2', text: 'I\'m doing great! Just enjoying this lovely weather.', timestamp: '0:05' }
-  ]);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [pace, setPace] = useState(1);
 
-  const scrollRef = useRef<HTMLDivElement | null>(null);
+  chatThread.current = [
+    { id: 1, role: 'Character 1', content: 'Hi there! How are you today?', timestamp: '0:00' },
+    { id: 2, role: 'Character 2', content: 'I\'m doing great! Just enjoying this lovely weather.', timestamp: '0:05' }
+  ]
+
+  const selectedModel = "RedPajama-INCITE-Chat-3B-v1-q4f16_1-MLC";
+  const modelUrl=  "https://huggingface.co/oopus/RedPajama-INCITE-Chat-3B-v1-q4f16_1-MLC"
+  const modelLib = "https://huggingface.co/oopus/magnum-v4-12b-MLC/resolve/main/RedPajama-INCITE-Chat-3B-v1-q4f16_1-webgpu.wasm"
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [chatThread]);
 
   const addMessage = () => {
     if (isPlaying) {
       const newMessage: Message = {
-        id: messages.length + 1,
-        speaker: messages.length % 2 === 0 ? 'Character 1' : 'Character 2',
-        text: 'This is a simulated response. In a real implementation, this would come from an LLM API.',
-        timestamp: `${Math.floor(messages.length / 2)}:${messages.length * 5 % 60}`
+        id: chatThread.current.length + 1,
+        role: chatThread.current.length % 2 === 0 ? 'Character 1' : 'Character 2',
+        content: 'This is a simulated response. In a real implementation, this would come from an LLM API.',
+        timestamp: `${Math.floor(chatThread.current.length / 2)}:${chatThread.current.length * 5 % 60}`
       };
-      setMessages([...messages, newMessage]);
+      chatThread.current = [...chatThread.current, newMessage];
     }
   };
 
@@ -84,7 +140,7 @@ export default function Home() {
       }
     }, 3000 / pace);
     return () => clearInterval(interval);
-  }, [isPlaying, pace, messages]);
+  }, [isPlaying, pace, chatThread.current]);
 
   return (
 <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 p-6">
@@ -95,24 +151,24 @@ export default function Home() {
         ref={scrollRef}
         className="h-[50vh] overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-gray-700 overflow-x-hidden"
       >
-        {messages.map((message) => (
+        {chatThread.current.map((message) => (
           <div key={message.id} className="transform transition-all duration-300 hover:scale-[1.02]">
             <div
               className={`p-4 rounded-lg ${
-                message.speaker === 'Character 1'
+                message.role === 'Character 1'
                   ? 'bg-gradient-to-r from-blue-500/10 to-blue-600/10 border-l-4 border-blue-500'
                   : 'bg-gradient-to-r from-green-500/10 to-green-600/10 border-l-4 border-green-500'
               }`}
             >
               <div
                 className={`font-bold mb-2 ${
-                  message.speaker === 'Character 1' ? 'text-blue-400' : 'text-green-400'
+                  message.role === 'Character 1' ? 'text-blue-400' : 'text-green-400'
                 }`}
               >
-                {message.speaker}
+                {message.role}
               </div>
               <div className="text-gray-100">
-                {message.text}
+                {message.content}
                 <span className="text-xs text-gray-400 ml-2">{message.timestamp}</span>
               </div>
             </div>
