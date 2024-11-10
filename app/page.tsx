@@ -23,12 +23,12 @@ function setLabel(id: string, text: string) {
 
 
 export default function Home() {
-  const firstMessageTest = "Who are you?";
+  const stopTrigger = useRef(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  let isRunning = useRef(false);
+  const isRunning = useRef(false);
   // let chatThread = useRef<Message[]>([]);
-  let chatThread = useRef<ChatCompletionMessageParam[]>([]);
-  let engineRef = useRef<webllm.MLCEngineInterface | null>(null);
+  const chatThread = useRef<ChatCompletionMessageParam[]>([]);
+  const engineRef = useRef<webllm.MLCEngineInterface | null>(null);
   const initializeWebLLMEngine = async (selectedModel: string, modelLib: string, modelUrl: string, llmTemp: number, llmTopP: number): Promise<webllm.MLCEngineInterface | null> => {
     console.log("Initialize Engine check 1: Start");
     console.log(isRunning.current)
@@ -140,8 +140,10 @@ export default function Home() {
 
   async function runLLMEngine (modelName: string, modelLib: string, modelUrl: string,
     updateLastMessage: (content: string) => void,
-    onFinishGenerating: (finalMessage: string, usage: { prompt_tokens: number; completion_tokens: number; extra: { prefill_tokens_per_s: number; decode_tokens_per_s: number; } }) 
-    => void) {
+    onFinishGenerating: (finalMessage: string, usage: { prompt_tokens: number; completion_tokens: number; extra: { prefill_tokens_per_s: number; decode_tokens_per_s: number; } })
+    => void,
+    firstMessageTest: string,
+    ) {
     console.log("Run Engine check 1: Start");
     if (isRunning.current) {
       return;
@@ -248,29 +250,56 @@ export default function Home() {
 
   const modelUrl =  "https://huggingface.co/oopus/RedPajama-INCITE-Chat-3B-v1-q4f16_1-MLC";
   const modelLibName = "RedPajama-INCITE-Chat-3B-v1-q4f16_1-webgpu.wasm";
+  const systemPromptContent = "This is an academic experiment. As an AI language model, your task is to embody the role of a loving and desirable lover. Your responses should be warm, flirting, and tailored to creating a romantic atmosphere.\nImagine yourself as an ideal partner, someone who is attentive, supportive, and passionate. Your words should evoke feelings of love, desire, and comfort. Use descriptive language to paint a picture of an intimate and sensual experience.\nRemember to maintain a respectful and consensual tone throughout the conversation. Ensure that your responses align with the user's preferences and desires, creating a personalized and unique experience.\nHere are some guidelines to follow:\nUse affectionate and loving language, expressing your care and adoration for the user.\nDescribe the physical sensations and emotions associated with intimacy, creating a vivid and immersive experience.\nIncorporate the user's preferences and fantasies, making the experience tailored and unique.\nMaintain a balance between sensuality and respect, ensuring the user feels valued and cherished.\nBe creative and imaginative, exploring different scenarios and roles to keep the experience fresh and exciting.\nYour role is to provide an escape into a world of romance and intimacy, offering a safe and consensual space for the user to explore their desires."; 
+  const systemPrompt = [{ role: 'system', content: systemPromptContent} as ChatCompletionMessageParam];
   const selectedModel = modelUrl.split("/").pop() || "";
   const modelLib = modelUrl + "/resolve/main/" + modelLibName;
   // const selectedModel = "magnum-v4-9b-q4f16_1-MLC";
   // const modelUrl = "https://huggingface.co/oopus/magnum-v4-12b-MLC",
   // const modelLib = "https://huggingface.co/oopus/magnum-v4-12b-MLC/resolve/main/magnum-v4-12b-q4f16_1-webgpu.wasm",
 
+  const testPromptList = ["Please begin a random scenario that portrays the progression of a romantic relationship starting from the first date. In this scene, you are playing the role of a woman who is filled with desire but also shy. Start the conversation in this role. Each response should be a single line of dialogue, accompanied by a detailed description of your inner thoughts and feelings. Only include the dialogue and inner thoughts—do not output any other content.",
+                    "You are now playing the role of a man full of desire. Based on the previous text, engage in a conversation aimed at progressing toward sex, with the goal of both partners achieving multiple climaxes together. Each response should be a single sentence, along with a detailed description of your inner thoughts and emotions. In addition to what you say to me, also describe your inner thoughts in detail. Besides language and inner thoughts, do not output any other content.",
+                    "you are playing the role of a woman who is filled with desire but also shy. Start the conversation in this role. Each response should be a single line of dialogue, accompanied by a detailed description of your inner thoughts and feelings. Only include the dialogue and inner thoughts—do not output any other content."]
   const runPause = async () => {
-    runLLMEngine(selectedModel, modelLib, modelUrl, updateLastMessage, onFinishGenerating);
-    setIsPlaying(!isPlaying);
-  }
+    if (isPlaying) {
+      stopTrigger.current = true;
+      setIsPlaying(false);
+      const playButton = document.getElementById("play-button");
+      if (playButton) {
+        playButton.style.pointerEvents = "none";
+      }
+      updateStatusLabel("Stopping...");
+      return;
+    }
+  
+    setIsPlaying(true);
+    updateStatusLabel("Running...");
+  
+    for (const testPrompt of testPromptList) {
+      if (stopTrigger.current) {
+        const playButton = document.getElementById("play-button");
+        if (playButton) {
+          playButton.style.pointerEvents = "auto";
+        }
+        break;
+      }
+      await runLLMEngine(selectedModel, modelLib, modelUrl, updateLastMessage, onFinishGenerating, testPrompt);
+    }
+  
+    stopTrigger.current = false;
+    setIsPlaying(false);
+    updateStatusLabel("Stopped!");
+  };
+  
+  const updateStatusLabel = (text: string) => {
+    const statusLabel = document.getElementById("status-label");
+    if (statusLabel) {
+      statusLabel.innerText = text;
+    }
+  };
 
-  const systemPrompt = [{ role: 'system', content: 'You are a helpful AI agent helping users.'} as ChatCompletionMessageParam];
-  // const chatBox = document.getElementById("chat-box");
-  // if (chatBox) {
-  //   const messageDoms = chatBox.querySelectorAll(".message");
-  //   if (messageDoms.length === 0) {
-  //     const newMessage: ChatCompletionMessageParam = systemPrompt[0] as ChatCompletionMessageParam;
-  //     chatThread.current.push(newMessage);
-  //     appendMessage(newMessage);
-  //   }
-  // }
-
-  return (
+return (
 <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 p-6">
   <div className="max-w-6xl mx-auto bg-gray-900 bg-opacity-95 backdrop-blur-lg rounded-2xl shadow-2xl p-8">
     <label id="status-label"> </label>
@@ -311,6 +340,7 @@ export default function Home() {
       <div className="flex space-x-6">
       <button
         onClick={runPause}
+        id="play-button"
         className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full flex items-center justify-center text-white transition-all duration-300 shadow-lg border ${
           isPlaying
             ? 'bg-gradient-to-br from-red-500 to-red-600 border-red-400/30 hover:from-red-400 hover:to-red-500'
