@@ -11,6 +11,7 @@ import {
   Settings
 } from 'lucide-react';
 import * as webllm from "@mlc-ai/web-llm";
+import { ChatCompletionMessageParam } from '@mlc-ai/web-llm';
 
 function setLabel(id: string, text: string) {
   const label = document.getElementById(id);
@@ -19,39 +20,29 @@ function setLabel(id: string, text: string) {
   }
   label.innerText = text;
 }
-const [isPlaying, setIsPlaying] = useState(false);
-const [pace, setPace] = useState(1);
 
-const scrollRef = useRef<HTMLDivElement | null>(null);
-
-interface Message {
-  id: number;
-  role: string;
-  content: string;
-  timestamp: string;
-}
 
 export default function Home() {
+  const firstMessageTest = "Who are you?";
+  const [isPlaying, setIsPlaying] = useState(false);
   let isRunning = useRef(false);
-  let chatThread = useRef<Message[]>([]);
+  // let chatThread = useRef<Message[]>([]);
+  let chatThread = useRef<ChatCompletionMessageParam[]>([]);
   let engineRef = useRef<webllm.MLCEngineInterface | null>(null);
   const initializeWebLLMEngine = async (selectedModel: string, modelLib: string, modelUrl: string, llmTemp: number, llmTopP: number): Promise<webllm.MLCEngineInterface | null> => {
-    if (isRunning.current) {
-      return null;
-    }
+    console.log("Initialize Engine check 1: Start");
+    console.log(isRunning.current)
+    console.log("Initialize Engine check 2: ready to initialize");
     isRunning.current = true;
     const initProgressCallback = (report: webllm.InitProgressReport) => {
-      setLabel("init-label", report.text);
+      setLabel("status-label", report.text);
     };
-    // const selectedModel = "magnum-v4-9b-q4f16_1-MLC";
     const appConfig: webllm.AppConfig = {
       model_list: [
         {
           model: modelUrl,
-          // model: "https://huggingface.co/oopus/magnum-v4-12b-MLC",
           model_id: selectedModel,
           model_lib: modelLib,
-            // "https://huggingface.co/oopus/magnum-v4-12b-MLC/resolve/main/magnum-v4-12b-q4f16_1-webgpu.wasm",
         },
       ],
     };
@@ -60,120 +51,257 @@ export default function Home() {
       { appConfig: appConfig, initProgressCallback: initProgressCallback,
         logLevel: "INFO",
       },
-      // {
-      //   context_window_size: 2048,
-      //   // sliding_window_size: 1024,
-      //   // attention_sink_size: 4,
-      // },
+      {
+        context_window_size: -1,
+        temperature: llmTemp,
+        top_p: llmTopP,
+        // max_new_tokens: 100,
+        sliding_window_size: 5000,
+        attention_sink_size: 0,
+      },
 
     );
+    console.log("Initialize Engine check 3: Engine initialized");
     return engine;
   }
 
-  async function runLLMEngine (modelName: string, modelLib: string, modelUrl: string) {
+  function updateLastMessage(content: string) {
+    const chatBox = document.getElementById("chat-box");
+    if (chatBox) {
+      const messageDoms = chatBox.querySelectorAll(".message");
+      const lastMessageDom = messageDoms[messageDoms.length - 1];
+      lastMessageDom.textContent = content;
+
+    }
+  }
+
+  const onFinishGenerating = (finalMessage: string, usage: { prompt_tokens: number; completion_tokens: number; extra: { prefill_tokens_per_s: number; decode_tokens_per_s: number; } }) => {
+    updateLastMessage(finalMessage);
+    const usageText =
+      `prompt_tokens: ${usage.prompt_tokens}, ` +
+      `completion_tokens: ${usage.completion_tokens}, ` +
+      `prefill: ${usage.extra.prefill_tokens_per_s.toFixed(4)} tokens/sec, ` +
+      `decoding: ${usage.extra.decode_tokens_per_s.toFixed(4)} tokens/sec`;
+    const chatStats = document.getElementById("status-label");
+    if (chatStats) {
+      chatStats.textContent = usageText;
+    }
+  };
+
+  function appendMessage(message: ChatCompletionMessageParam) {
+    // console.log("Append message check 1:");
+    // console.log("message", message);
+    const chatBox = document.getElementById("chat-box");
+    const container = document.createElement("div");
+    container.classList.add("message-container");
+    if (message.role === "user") {
+      // console.log("Append message check 2:");
+      // console.log("Adding user message", message);
+      container.classList.add("user");
+    } else {
+      console.log("Append message check 2:");
+      console.log("Adding assistant message", message);
+      container.classList.add("assistant");
+    }
+
+    const newMessage = document.createElement("div");
+    newMessage.classList.add("message");
+    newMessage.textContent = typeof message.content === 'string' ? message.content : '';
+
+  
+    container.appendChild(newMessage);
+    if (chatBox) {
+      chatBox.appendChild(container);
+    }
+    if (chatBox) {
+      chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the latest message
+    }
+    // console.log("Append message check 3: End");
+  }
+
+  function updatechatThreadFromDom() { 
+    const chatBox = document.getElementById("chat-box");
+    if (chatBox) {
+      const messageContainers = chatBox.querySelectorAll(".message-container");
+      chatThread.current = [];
+      messageContainers.forEach((container) => {
+        const role = container.classList.contains("user") ? "user" : "assistant";
+        const messageDom = container.querySelector(".message");
+        if (role === "user") {
+          chatThread.current.push({ role: "user", content: messageDom ? messageDom.textContent : "" } as ChatCompletionMessageParam);
+        } else {
+          chatThread.current.push({ role: "assistant", content: messageDom ? messageDom.textContent : "" } as ChatCompletionMessageParam);
+        }
+      });
+      // console.log("Read chatThread from DOM:");
+      // console.log(chatThread.current);
+    }
+  }
+
+  async function runLLMEngine (modelName: string, modelLib: string, modelUrl: string,
+    updateLastMessage: (content: string) => void,
+    onFinishGenerating: (finalMessage: string, usage: { prompt_tokens: number; completion_tokens: number; extra: { prefill_tokens_per_s: number; decode_tokens_per_s: number; } }) 
+    => void) {
+    console.log("Run Engine check 1: Start");
     if (isRunning.current) {
       return;
     }
     isRunning.current = true;
     let engine: webllm.MLCEngineInterface | null = null;
+    console.log("Run Engine check 2: ready to initialize");
     if (engineRef.current === null) {
-      const engine = await initializeWebLLMEngine(modelName, modelLib, modelUrl, 0.5, 0.9);
+      engine = await initializeWebLLMEngine(modelName, modelLib, modelUrl, 0.5, 0.9);
+      console.log("Run Engine check 3: Engine initialized - unchecked");
       if (engine !== null) {
+        console.log("Run Engine check 4: Engine initialized - checked");
         engineRef.current = engine;
+      }else{
+        console.log("Run Engine check 4: Engine not initialized");
+        isRunning.current = false;
+        setIsPlaying(false);
+        return;
       }
+    } else {
+      engine = engineRef.current;
+      console.log("Engine already initialized");
     }
-    if (engine ! == null) {
-      const reply0 = await engine!.chat.completions.create({
-        messages: [{ role: "user", content: "List three US states." }],
-        stream: true,
-        stream_options: { include_usage: true },
-    });
-    // 记得一轮运行完成之后 isRunning.current = false;
-    for await (const chunk of reply0) {
-      console.log("1-5 Chunk...");
+    if (engine !== null) {
+      console.log("Run Engine check 5: Ready to run");
       try {
-        const curDelta = chunk.choices[0]?.delta.content;
-        console.log(curDelta);
+        let curMessage = "";
+        
+        const chatBox = document.getElementById("chat-box");
+        if (chatBox) {
+          updatechatThreadFromDom();
+          console.log("Run Engine check 5.1: Chatbox create");
+          console.log("chatThread.current:");
+          console.log(chatThread.current);
+          const newMessage: ChatCompletionMessageParam = { role: 'user', content: firstMessageTest };
+          chatThread.current.push(newMessage);
+          chatThread.current = [... systemPrompt, ... chatThread.current];
+          appendMessage(newMessage);
+        }else{
+          console.log("Run Engine check 5.1: Chatbox not created");
+        }
+        let usage;
+        console.log("Run Engine check 6: Completions create");
+        console.log("chatThread.current:");
+        console.log(chatThread.current);
+        const assistantMessage: ChatCompletionMessageParam = { role: 'assistant', content: 'Generating...' };
+        // chatThread.current.push(assistantMessage);
+        appendMessage(assistantMessage);
+        const reply0 = await engine.chat.completions.create({
+          // messages: chatThread.current,
+          // message should be system prompt + chatThread.current
+          messages: chatThread.current,
+          stream: true,
+          stream_options: { include_usage: true },
+        });
+        console.log("Run Engine check 7: Completions created");
+        console.log("chatThread.current:");
+        console.log(chatThread.current);
+        for await (const chunk of reply0) {
+          console.log("1-5 Chunk...");
+          try {
+            const curDelta = chunk.choices[0]?.delta.content;
+            if (curDelta) {
+              curMessage += curDelta;
+            }
+            if (chunk.usage) {
+              usage = chunk.usage;
+            }
+            updateLastMessage(curMessage);
+            const finalMessage = await engine.getMessage();
+            if (usage) {
+              onFinishGenerating(finalMessage, usage);
+              chatThread.current = [...chatThread.current, { role: 'assistant', content: finalMessage }];
+            }
+            // console.log(curDelta);
+            // const newMessage: ChatCompletionMessageParam = {
+            //   role: 'user',
+            //   content: curDelta || '',
+            // };
+            // chatThread.current = [...chatThread.current, newMessage];
+          } catch (e) {
+            // console.log(e);
+          }
+        }
+        console.log("Run Engine check 8: End");
+        console.log("chatThread.current:");
+        console.log(chatThread.current);
       } catch (e) {
-        // console.log(e);
+        console.log(engine);
+        console.log(e);
+        setIsPlaying(false);
+        console.log("chatThread.current:");
+        console.log(chatThread.current);
+        // stop the program
+        return;
       }
-    }
+      // 记得一轮运行完成之后 isRunning.current = false;
+    console.log("Run Engine check 8: End");
+    console.log(chatThread.current);
+    isRunning.current = false;
+    setIsPlaying(false);
   }
   }
 
+  const modelUrl =  "https://huggingface.co/oopus/RedPajama-INCITE-Chat-3B-v1-q4f16_1-MLC";
+  const modelLibName = "RedPajama-INCITE-Chat-3B-v1-q4f16_1-webgpu.wasm";
+  const selectedModel = modelUrl.split("/").pop() || "";
+  const modelLib = modelUrl + "/resolve/main/" + modelLibName;
+  // const selectedModel = "magnum-v4-9b-q4f16_1-MLC";
+  // const modelUrl = "https://huggingface.co/oopus/magnum-v4-12b-MLC",
+  // const modelLib = "https://huggingface.co/oopus/magnum-v4-12b-MLC/resolve/main/magnum-v4-12b-q4f16_1-webgpu.wasm",
 
-  chatThread.current = [
-    { id: 1, role: 'Character 1', content: 'Hi there! How are you today?', timestamp: '0:00' },
-    { id: 2, role: 'Character 2', content: 'I\'m doing great! Just enjoying this lovely weather.', timestamp: '0:05' }
-  ]
-
-  const selectedModel = "RedPajama-INCITE-Chat-3B-v1-q4f16_1-MLC";
-  const modelUrl=  "https://huggingface.co/oopus/RedPajama-INCITE-Chat-3B-v1-q4f16_1-MLC"
-  const modelLib = "https://huggingface.co/oopus/magnum-v4-12b-MLC/resolve/main/RedPajama-INCITE-Chat-3B-v1-q4f16_1-webgpu.wasm"
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [chatThread]);
-
-  const addMessage = () => {
-    if (isPlaying) {
-      const newMessage: Message = {
-        id: chatThread.current.length + 1,
-        role: chatThread.current.length % 2 === 0 ? 'Character 1' : 'Character 2',
-        content: 'This is a simulated response. In a real implementation, this would come from an LLM API.',
-        timestamp: `${Math.floor(chatThread.current.length / 2)}:${chatThread.current.length * 5 % 60}`
-      };
-      chatThread.current = [...chatThread.current, newMessage];
-    }
-  };
-
-  const togglePlayStop = () => {
+  const runPause = async () => {
+    runLLMEngine(selectedModel, modelLib, modelUrl, updateLastMessage, onFinishGenerating);
     setIsPlaying(!isPlaying);
-  };
+  }
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (isPlaying) {
-        addMessage();
-      }
-    }, 3000 / pace);
-    return () => clearInterval(interval);
-  }, [isPlaying, pace, chatThread.current]);
+  const systemPrompt = [{ role: 'system', content: 'You are a helpful AI agent helping users.'} as ChatCompletionMessageParam];
+  // const chatBox = document.getElementById("chat-box");
+  // if (chatBox) {
+  //   const messageDoms = chatBox.querySelectorAll(".message");
+  //   if (messageDoms.length === 0) {
+  //     const newMessage: ChatCompletionMessageParam = systemPrompt[0] as ChatCompletionMessageParam;
+  //     chatThread.current.push(newMessage);
+  //     appendMessage(newMessage);
+  //   }
+  // }
 
   return (
 <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 p-6">
   <div className="max-w-6xl mx-auto bg-gray-900 bg-opacity-95 backdrop-blur-lg rounded-2xl shadow-2xl p-8">
+    <label id="status-label"> </label>
     {/* Chat Display */}
-    <div className="mb-8 bg-gray-800 rounded-lg p-4 shadow-inner border border-purple-500/20">
+    <div className="chat-container mb-8 bg-gray-800 rounded-lg p-4 shadow-inner border border-purple-500/20">
       <div
-        ref={scrollRef}
+        id="chat-box"
         className="h-[50vh] overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-gray-700 overflow-x-hidden"
       >
-        {chatThread.current.map((message) => (
-          <div key={message.id} className="transform transition-all duration-300 hover:scale-[1.02]">
+        {/* {chatThread.current.map((message) => (
+          <div className="transform transition-all duration-300 hover:scale-[1.02]">
             <div
               className={`p-4 rounded-lg ${
-                message.role === 'Character 1'
+                message.role === 'user'
                   ? 'bg-gradient-to-r from-blue-500/10 to-blue-600/10 border-l-4 border-blue-500'
                   : 'bg-gradient-to-r from-green-500/10 to-green-600/10 border-l-4 border-green-500'
               }`}
             >
               <div
                 className={`font-bold mb-2 ${
-                  message.role === 'Character 1' ? 'text-blue-400' : 'text-green-400'
+                  message.role === 'user' ? 'text-blue-400' : 'text-green-400'
                 }`}
               >
                 {message.role}
               </div>
               <div className="text-gray-100">
-                {message.content}
-                <span className="text-xs text-gray-400 ml-2">{message.timestamp}</span>
+                {Array.isArray(message.content) ? "" : message.content}
               </div>
             </div>
           </div>
-        ))}
+        ))} */}
       </div>
     </div>
 
@@ -182,7 +310,7 @@ export default function Home() {
       {/* Play/Stop Controls */}
       <div className="flex space-x-6">
       <button
-        onClick={togglePlayStop}
+        onClick={runPause}
         className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full flex items-center justify-center text-white transition-all duration-300 shadow-lg border ${
           isPlaying
             ? 'bg-gradient-to-br from-red-500 to-red-600 border-red-400/30 hover:from-red-400 hover:to-red-500'
