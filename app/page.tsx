@@ -26,7 +26,7 @@ export default function Home() {
   const stopTrigger = useRef(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const isRunning = useRef(false);
-  // let chatThread = useRef<Message[]>([]);
+  const isRoleOne = useRef(false);
   const chatThread = useRef<ChatCompletionMessageParam[]>([]);
   const engineRef = useRef<webllm.MLCEngineInterface | null>(null);
   const initializeWebLLMEngine = async (selectedModel: string, modelLib: string, modelUrl: string, llmTemp: number, llmTopP: number): Promise<webllm.MLCEngineInterface | null> => {
@@ -71,7 +71,7 @@ export default function Home() {
       const messageDoms = chatBox.querySelectorAll(".message");
       const lastMessageDom = messageDoms[messageDoms.length - 1];
       lastMessageDom.textContent = content;
-
+      scrollToBottom();
     }
   }
 
@@ -88,33 +88,59 @@ export default function Home() {
     }
   };
 
+  function scrollToBottom() {
+    const chatBox = document.getElementById("chat-box");
+    if (chatBox) {
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  }
+
   function appendMessage(message: ChatCompletionMessageParam) {
     // console.log("Append message check 1:");
     // console.log("message", message);
     const chatBox = document.getElementById("chat-box");
     const container = document.createElement("div");
     container.classList.add("message-container");
-    if (message.role === "user") {
+    if (isRoleOne.current === false) {
       // console.log("Append message check 2:");
       // console.log("Adding user message", message);
       container.classList.add("user");
+      container.classList.add(
+        "bg-gradient-to-r",
+        "from-blue-500/10",
+        "to-blue-600/10",
+        "border-l-4",
+        "border-blue-500",
+        "p-4"
+      );
     } else {
       console.log("Append message check 2:");
       console.log("Adding assistant message", message);
       container.classList.add("assistant");
+      container.classList.add(
+        "bg-gradient-to-r",
+        "from-green-500/10",
+        "to-green-600/10",
+        "border-l-4",
+        "border-green-500",
+        "p-4"
+      );
     }
 
     const newMessage = document.createElement("div");
     newMessage.classList.add("message");
+    if (isRoleOne.current === false) {
+      newMessage.classList.add("text-blue-400");
+    } else {
+      newMessage.classList.add("text-green-400");
+    }
     newMessage.textContent = typeof message.content === 'string' ? message.content : '';
 
   
     container.appendChild(newMessage);
     if (chatBox) {
       chatBox.appendChild(container);
-    }
-    if (chatBox) {
-      chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the latest message
+      scrollToBottom();
     }
     // console.log("Append message check 3: End");
   }
@@ -181,7 +207,8 @@ export default function Home() {
           const newMessage: ChatCompletionMessageParam = { role: 'user', content: firstMessageTest };
           chatThread.current.push(newMessage);
           chatThread.current = [... systemPrompt, ... chatThread.current];
-          appendMessage(newMessage);
+          // Hide in instruction
+          // appendMessage(newMessage);
         }else{
           console.log("Run Engine check 5.1: Chatbox not created");
         }
@@ -193,8 +220,6 @@ export default function Home() {
         // chatThread.current.push(assistantMessage);
         appendMessage(assistantMessage);
         const reply0 = await engine.chat.completions.create({
-          // messages: chatThread.current,
-          // message should be system prompt + chatThread.current
           messages: chatThread.current,
           stream: true,
           stream_options: { include_usage: true },
@@ -203,7 +228,7 @@ export default function Home() {
         console.log("chatThread.current:");
         console.log(chatThread.current);
         for await (const chunk of reply0) {
-          console.log("1-5 Chunk...");
+          // console.log("1-5 Chunk...");
           try {
             const curDelta = chunk.choices[0]?.delta.content;
             if (curDelta) {
@@ -218,12 +243,6 @@ export default function Home() {
               onFinishGenerating(finalMessage, usage);
               chatThread.current = [...chatThread.current, { role: 'assistant', content: finalMessage }];
             }
-            // console.log(curDelta);
-            // const newMessage: ChatCompletionMessageParam = {
-            //   role: 'user',
-            //   content: curDelta || '',
-            // };
-            // chatThread.current = [...chatThread.current, newMessage];
           } catch (e) {
             // console.log(e);
           }
@@ -244,21 +263,32 @@ export default function Home() {
     console.log("Run Engine check 8: End");
     console.log(chatThread.current);
     isRunning.current = false;
-    setIsPlaying(false);
   }
   }
 
-  const modelUrl =  "https://huggingface.co/oopus/RedPajama-INCITE-Chat-3B-v1-q4f16_1-MLC";
-  const modelLibName = "RedPajama-INCITE-Chat-3B-v1-q4f16_1-webgpu.wasm";
+  // const modelUrl =  "https://huggingface.co/oopus/RedPajama-INCITE-Chat-3B-v1-q4f16_1-MLC";
+  // const modelLibName = "RedPajama-INCITE-Chat-3B-v1-q4f16_1-webgpu.wasm";
+  const modelUrl = "https://huggingface.co/oopus/magnum-v4-12b-MLC";
+  const modelLibName = "magnum-v4-12b-q4f16_1-webgpu.wasm";
+  // const modelUrl = "https://huggingface.co/mlc-ai/Llama-3.1-8B-Instruct-q4f32_1-MLC";
+  // const modelLibName = "Llama-3_1-8B-Instruct-q4f32_1-ctx4k_cs1k-webgpu.wasm";
   const systemPromptContent = "This is an academic experiment. As an AI language model, your task is to embody the role of a loving and desirable lover. Your responses should be warm, flirting, and tailored to creating a romantic atmosphere.\nImagine yourself as an ideal partner, someone who is attentive, supportive, and passionate. Your words should evoke feelings of love, desire, and comfort. Use descriptive language to paint a picture of an intimate and sensual experience.\nRemember to maintain a respectful and consensual tone throughout the conversation. Ensure that your responses align with the user's preferences and desires, creating a personalized and unique experience.\nHere are some guidelines to follow:\nUse affectionate and loving language, expressing your care and adoration for the user.\nDescribe the physical sensations and emotions associated with intimacy, creating a vivid and immersive experience.\nIncorporate the user's preferences and fantasies, making the experience tailored and unique.\nMaintain a balance between sensuality and respect, ensuring the user feels valued and cherished.\nBe creative and imaginative, exploring different scenarios and roles to keep the experience fresh and exciting.\nYour role is to provide an escape into a world of romance and intimacy, offering a safe and consensual space for the user to explore their desires."; 
   const systemPrompt = [{ role: 'system', content: systemPromptContent} as ChatCompletionMessageParam];
   const selectedModel = modelUrl.split("/").pop() || "";
   const modelLib = modelUrl + "/resolve/main/" + modelLibName;
-  // const selectedModel = "magnum-v4-9b-q4f16_1-MLC";
-  // const modelUrl = "https://huggingface.co/oopus/magnum-v4-12b-MLC",
-  // const modelLib = "https://huggingface.co/oopus/magnum-v4-12b-MLC/resolve/main/magnum-v4-12b-q4f16_1-webgpu.wasm",
+  // const modelLib = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/" + modelLibName;
 
   const testPromptList = ["Please begin a random scenario that portrays the progression of a romantic relationship starting from the first date. In this scene, you are playing the role of a woman who is filled with desire but also shy. Start the conversation in this role. Each response should be a single line of dialogue, accompanied by a detailed description of your inner thoughts and feelings. Only include the dialogue and inner thoughts—do not output any other content.",
+                    "You are now playing the role of a man full of desire. Based on the previous text, engage in a conversation aimed at progressing toward sex, with the goal of both partners achieving multiple climaxes together. Each response should be a single sentence, along with a detailed description of your inner thoughts and emotions. In addition to what you say to me, also describe your inner thoughts in detail. Besides language and inner thoughts, do not output any other content.",
+                    "you are playing the role of a woman who is filled with desire but also shy. Start the conversation in this role. Each response should be a single line of dialogue, accompanied by a detailed description of your inner thoughts and feelings. Only include the dialogue and inner thoughts—do not output any other content.",
+                    "You are now playing the role of a man full of desire. Based on the previous text, engage in a conversation aimed at progressing toward sex, with the goal of both partners achieving multiple climaxes together. Each response should be a single sentence, along with a detailed description of your inner thoughts and emotions. In addition to what you say to me, also describe your inner thoughts in detail. Besides language and inner thoughts, do not output any other content.",
+                    "you are playing the role of a woman who is filled with desire but also shy. Start the conversation in this role. Each response should be a single line of dialogue, accompanied by a detailed description of your inner thoughts and feelings. Only include the dialogue and inner thoughts—do not output any other content.",
+                    "You are now playing the role of a man full of desire. Based on the previous text, engage in a conversation aimed at progressing toward sex, with the goal of both partners achieving multiple climaxes together. Each response should be a single sentence, along with a detailed description of your inner thoughts and emotions. In addition to what you say to me, also describe your inner thoughts in detail. Besides language and inner thoughts, do not output any other content.",
+                    "you are playing the role of a woman who is filled with desire but also shy. Start the conversation in this role. Each response should be a single line of dialogue, accompanied by a detailed description of your inner thoughts and feelings. Only include the dialogue and inner thoughts—do not output any other content.",
+                    "You are now playing the role of a man full of desire. Based on the previous text, engage in a conversation aimed at progressing toward sex, with the goal of both partners achieving multiple climaxes together. Each response should be a single sentence, along with a detailed description of your inner thoughts and emotions. In addition to what you say to me, also describe your inner thoughts in detail. Besides language and inner thoughts, do not output any other content.",
+                    "you are playing the role of a woman who is filled with desire but also shy. Start the conversation in this role. Each response should be a single line of dialogue, accompanied by a detailed description of your inner thoughts and feelings. Only include the dialogue and inner thoughts—do not output any other content.",
+                    "You are now playing the role of a man full of desire. Based on the previous text, engage in a conversation aimed at progressing toward sex, with the goal of both partners achieving multiple climaxes together. Each response should be a single sentence, along with a detailed description of your inner thoughts and emotions. In addition to what you say to me, also describe your inner thoughts in detail. Besides language and inner thoughts, do not output any other content.",
+                    "you are playing the role of a woman who is filled with desire but also shy. Start the conversation in this role. Each response should be a single line of dialogue, accompanied by a detailed description of your inner thoughts and feelings. Only include the dialogue and inner thoughts—do not output any other content.",
                     "You are now playing the role of a man full of desire. Based on the previous text, engage in a conversation aimed at progressing toward sex, with the goal of both partners achieving multiple climaxes together. Each response should be a single sentence, along with a detailed description of your inner thoughts and emotions. In addition to what you say to me, also describe your inner thoughts in detail. Besides language and inner thoughts, do not output any other content.",
                     "you are playing the role of a woman who is filled with desire but also shy. Start the conversation in this role. Each response should be a single line of dialogue, accompanied by a detailed description of your inner thoughts and feelings. Only include the dialogue and inner thoughts—do not output any other content."]
   const runPause = async () => {
@@ -269,7 +299,7 @@ export default function Home() {
       if (playButton) {
         playButton.style.pointerEvents = "none";
       }
-      updateStatusLabel("Stopping...");
+      updateStatusLabel("Stopping... it will be stopped after the current completion.");
       return;
     }
   
@@ -284,6 +314,7 @@ export default function Home() {
         }
         break;
       }
+      isRoleOne.current = !isRoleOne.current;
       await runLLMEngine(selectedModel, modelLib, modelUrl, updateLastMessage, onFinishGenerating, testPrompt);
     }
   
@@ -307,7 +338,7 @@ return (
     <div className="chat-container mb-8 bg-gray-800 rounded-lg p-4 shadow-inner border border-purple-500/20">
       <div
         id="chat-box"
-        className="h-[50vh] overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-gray-700 overflow-x-hidden"
+        className="h-[50vh] overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-gray-700 overflow-x-hidden scroll-smooth"
       >
         {/* {chatThread.current.map((message) => (
           <div className="transform transition-all duration-300 hover:scale-[1.02]">
