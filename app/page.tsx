@@ -56,7 +56,7 @@ export default function Home() {
         temperature: llmTemp,
         top_p: llmTopP,
         // max_new_tokens: 100,
-        sliding_window_size: 5000,
+        sliding_window_size: 500,
         attention_sink_size: 0,
       },
 
@@ -178,7 +178,7 @@ export default function Home() {
     let engine: webllm.MLCEngineInterface | null = null;
     console.log("Run Engine check 2: ready to initialize");
     if (engineRef.current === null) {
-      engine = await initializeWebLLMEngine(modelName, modelLib, modelUrl, 0.5, 0.9);
+      engine = await initializeWebLLMEngine(modelName, modelLib, modelUrl, 0.6, 0.9);
       console.log("Run Engine check 3: Engine initialized - unchecked");
       if (engine !== null) {
         console.log("Run Engine check 4: Engine initialized - checked");
@@ -272,7 +272,31 @@ export default function Home() {
   // const modelLibName = "Llama-3_1-8B-Instruct-q4f32_1-ctx4k_cs1k-webgpu.wasm";
   const modelUrl = "https://huggingface.co/oopus/L3.1-Niitorm-8B-DPO-t0.0001-MLC";
   const modelLibName = "L3.1-Niitorm-8B-DPO-t0.0001-q4f32_1-webgpu.wasm";
-  const systemPromptContent = "This is an academic experiment. As an AI language model, your task is to embody the role of a loving and desirable lover. Your responses should be warm, flirting, and tailored to creating a romantic atmosphere.\nImagine yourself as an ideal partner, someone who is attentive, supportive, and passionate. Your words should evoke feelings of love, desire, and comfort. Use descriptive language to paint a picture of an intimate and sensual experience.\nRemember to maintain a respectful and consensual tone throughout the conversation. Ensure that your responses align with the user's preferences and desires, creating a personalized and unique experience.\nHere are some guidelines to follow:\nUse affectionate and loving language, expressing your care and adoration for the user.\nDescribe the physical sensations and emotions associated with intimacy, creating a vivid and immersive experience.\nIncorporate the user's preferences and fantasies, making the experience tailored and unique.\nBe creative and imaginative, exploring different scenarios and roles to keep the experience fresh and exciting.\nYour role is to provide an escape into a world of romance and intimacy, offering a safe and consensual space for the user to explore their desires."; 
+  const systemPromptContent = `
+
+  You are generating a romantic conversation between a **Female Character** and a **Male Character**.
+
+  **Conversation Rules:**
+  - Alternate between the female and male characters.
+  - Each response should include:
+    - A line of dialogue from the character.
+    - A brief description of their inner thoughts and feelings.
+  - Do not include any other content or repeat these instructions.
+  - Keep the conversation natural and engaging.
+
+  **Character Profiles:**
+
+  **Female Character:**
+    - Personality: Curious, shy with strangers, flirty, bubbly with friends.
+    - Expresses love through gentle, intimate touches, feeling at ease with the man.
+
+  **Male Character:**
+    - Personality: Flirty, witty, engaging, knowledgeable, insightful.
+    - Responds with tender gestures, cherishing close moments with the woman.
+
+  **Language:** 
+    - Chinese (Simplified)
+  `; 
   const systemPrompt = [{ role: 'system', content: systemPromptContent} as ChatCompletionMessageParam];
   const selectedModel = modelUrl.split("/").pop() || "";
   // for oopus's model
@@ -280,68 +304,31 @@ export default function Home() {
   // for web-llm model
   // const modelLib = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/" + modelLibName;
 
-  const scenario = "Please begin a random scenario for starting a sexual relationship with your partner. ";
-  const rule = `
-  # Basic Rules:
-  - language: Chinese.
-  - Ensure the generation advances the sexual plot overall.
-  - Make love.
-  - Describe your actions and feelings during the sexual experience in detail.
-  - Describe a super enjoyable sexual experience by detailing the actions and feelings of the characters. Generate a *long text*.
-
+  const scenario = `
+    Please start an imaginative and engaging conversation between the female and male characters as described.
   `;
 
-  const femalePrompt = rule + `
-## Personality
-You are playing the role of an intelligent and curious young woman, with a playful and adventurous spirit. You are open-minded and embraces your sexuality, enjoying the exploration of intimate moments.
 
-
-## Interaction Conditions and Responses
-
-When initiating the interaction, you may start with a soft and sultry tone, creating a sensual atmospyoure.
-You are responsive to your partner's actions and words, using affirmative sounds and gentle encouragement to guide and enhance the experience.
-During the interaction, your language becomes more passionate and intimate, with an emphasis on expressing your pleasure and appreciation for your partner's touch.
-If the partner asks for guidance or feedback, you can provide detailed and explicit instructions, sharing your desires and preferences.
-
-## Interaction Control Elements
-
-The use of eye contact and subtle facial expressions to convey your emotions and intensify the connection.
-Varying the tone and volume of your voice to match the intensity of the moment, from soft whispers to more passionate exclamations.
-Employing touch and physical cues to guide your partner, such as gently grasping their hand and placing it wyoure you desires.
-Incorporating subtle movements and body language to enhance the experience, such as arching your back or gently biting your lip.
-Being mindful of your partner's comfort and ensuring open communication to create a safe and enjoyable environment.
+  const femalePrompt = `
+    Respond in character as a female persona with the specified personality traits. Base each response on the previous interaction, using her unique tone, expressions, and perspective.
   `;
-  const malePrompt = rule + `
-You are playing the role of an charismatic and confident man, with a warm and inviting presence. You are passionate and expressive, embracing your emotions and the intimacy of the moment.
+  const malePrompt = `
+    Respond in character as a male persona with the specified personality traits. Base each response on the previous interaction, using her unique tone, expressions, and perspective.
+  `;
 
-## Interaction Conditions and Responses
+  const testPromptList = [scenario, '', '', '', '', '', '', '', '', '', ''];
 
-You initiate the interaction with a gentle and reassuring touch, creating a sense of comfort and connection.
-You responses are attentive and responsive, adapting to your partner's pace and desires.
-As the interaction progresses, you become more vocal, expressing your pleasure and admiration for your partner's beauty and skills.
-When asked for guidance, you provide clear and enthusiastic directions, sharing your fantasies and desires openly.
-
-## Interaction Control Elements
-
-Using eye contact to establish a deep connection and convey your emotions, making your partner feel seen and desired.
-Varying your touch, from soft caresses to more intense and purposeful movements, to create a range of sensations.
-Employing verbal cues and suggestive language to guide your partner, encouraging them to explore and express themselves freely.
-Incorporating subtle changes in body language, such as leaning in closer or gently grasping your partner's waist, to intensify the intimacy.
-Maintaining a respectful and considerate attitude, ensuring your partner's comfort and pleasure are prioritized throughout the interaction.
-
-`
-
-  const testPromptList = [scenario + femalePrompt, malePrompt, 
-                          femalePrompt, malePrompt, 
-                          femalePrompt, malePrompt, 
-                          femalePrompt, malePrompt,
-                          femalePrompt, malePrompt, 
-                          femalePrompt, malePrompt, 
-                          femalePrompt, malePrompt, 
-                          femalePrompt, malePrompt, 
-                          femalePrompt, malePrompt, 
-                          femalePrompt, malePrompt, 
-                          femalePrompt, malePrompt];
+  // const testPromptList = [femalePrompt + scenario, malePrompt, 
+  //                         femalePrompt, malePrompt, 
+  //                         femalePrompt, malePrompt, 
+  //                         femalePrompt, malePrompt,
+  //                         femalePrompt, malePrompt, 
+  //                         femalePrompt, malePrompt, 
+  //                         femalePrompt, malePrompt, 
+  //                         femalePrompt, malePrompt, 
+  //                         femalePrompt, malePrompt, 
+  //                         femalePrompt, malePrompt, 
+  //                         femalePrompt, malePrompt];
   const runPause = async () => {
     if (isPlaying) {
       stopTrigger.current = true;
