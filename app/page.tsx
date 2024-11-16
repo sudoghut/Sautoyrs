@@ -243,6 +243,8 @@ export default function Home() {
               onFinishGenerating(finalMessage, usage);
               chatThread.current = [...chatThread.current, { role: 'assistant', content: finalMessage }];
             }
+            console.log("Run Engine check 8: ChatThread display");
+            console.log(chatThread.current);
           } catch (e) {
             // console.log(e);
           }
