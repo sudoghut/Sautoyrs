@@ -56,7 +56,7 @@ export default function Home() {
         temperature: llmTemp,
         top_p: llmTopP,
         // max_new_tokens: 100,
-        sliding_window_size: 500,
+        sliding_window_size: 1000,
         attention_sink_size: 0,
       },
 
@@ -170,6 +170,40 @@ export default function Home() {
     => void,
     firstMessageTest: string,
     ) {
+    let systemPromptContent = `
+    You are generating a romantic conversation.
+    
+    **Conversation Guidelines:**  
+
+    - Output Language:  Chinese (Simplified).  
+    - Each response must include:  
+      - A line of dialogue spoken by the character.  
+      - A brief description of your inner thoughts and feelings in the Output Language. 
+    - Keep the tone engaging, and aligned with the characters' profile. 
+    
+    
+    **Character Profile:**  
+    
+    `
+    const systemPromptContentFemale = `   
+    **Female Character:**  
+    - **Personality:** Curious and shy with strangers but flirty and bubbly with friends.  
+    - **Expressions of Love:** Shows affection through gentle, intimate touches and feels comfortable in the man’s presence.
+    `;
+    const systemPromptContentMale = `
+    **Male Character:**  
+    - **Personality:** Flirty, witty, and engaging.
+    - **Expressions of Love:** Responds with tender gestures, savoring close moments with the woman.  
+      `; 
+    if (isRoleOne.current === true) {
+      systemPromptContent += systemPromptContentFemale;
+    } else {
+      systemPromptContent += systemPromptContentMale;
+    }
+      // systemPrompt = [{ role: 'system', content: systemPromptContent} as ChatCompletionMessageParam];
+      
+    const systemPrompt = [{ role: 'system', content: systemPromptContent} as ChatCompletionMessageParam];
+    chatThread.current = [... systemPrompt, ... chatThread.current];
     console.log("Run Engine check 1: Start");
     if (isRunning.current) {
       return;
@@ -178,7 +212,8 @@ export default function Home() {
     let engine: webllm.MLCEngineInterface | null = null;
     console.log("Run Engine check 2: ready to initialize");
     if (engineRef.current === null) {
-      engine = await initializeWebLLMEngine(modelName, modelLib, modelUrl, 0.6, 0.9);
+    // if (1 === 1) {
+      engine = await initializeWebLLMEngine(modelName, modelLib, modelUrl, 0.9, 0.5);
       console.log("Run Engine check 3: Engine initialized - unchecked");
       if (engine !== null) {
         console.log("Run Engine check 4: Engine initialized - checked");
@@ -213,20 +248,42 @@ export default function Home() {
           console.log("Run Engine check 5.1: Chatbox not created");
         }
         let usage;
-        console.log("Run Engine check 6: Completions create");
-        console.log("chatThread.current:");
-        console.log(chatThread.current);
-        const assistantMessage: ChatCompletionMessageParam = { role: 'assistant', content: 'Generating...' };
-        // chatThread.current.push(assistantMessage);
-        appendMessage(assistantMessage);
+        let shortConversation;
+        // First round, it will only have systemPrompt, senario prompt, so we don't need to change the conversation length
+        // From the second round, we will only keep systemPrompt and the last two messages
+        const memoryLength = 1;
+        // plus 2 is for the systemPrompt and the current instruct prompt
+        if (chatThread.current.length > memoryLength+2) {
+          shortConversation = [... systemPrompt, ... chatThread.current.slice(-(memoryLength+2-1))];
+        } else {
+          shortConversation = [... chatThread.current];
+        }
+        const newRoleSetting = ['system', "user", "assistant", "user"];
+        // reset "role" in shortConversation by newRoleSetting
+        // currentNewRoleSetting is first get the first n. Then, based on the length of shortConversation, get role from the right side of newRoleSetting
+        const currentNewRoleSetting = [
+          newRoleSetting[0],
+          ...newRoleSetting.slice(-(shortConversation.length - 1))
+        ];
+        console.log("currentNewRoleSetting:");
+        console.log(currentNewRoleSetting);
+        shortConversation.forEach((message, index) => {
+          message.role = currentNewRoleSetting[index] as "user" | "assistant" | "system" | "tool";
+        });
+        console.log("Run Engine check 6: chatThread ready to run");
+        console.log("shortConversation:");
+        console.log(shortConversation);
         const reply0 = await engine.chat.completions.create({
-          messages: chatThread.current,
+          // messages: chatThread.current,
+          messages: shortConversation,
           stream: true,
           stream_options: { include_usage: true },
         });
-        console.log("Run Engine check 7: Completions created");
-        console.log("chatThread.current:");
-        console.log(chatThread.current);
+        const assistantMessage: ChatCompletionMessageParam = { role: 'assistant', content: 'Generating...' };
+        appendMessage(assistantMessage);
+        // console.log("Run Engine check 7: Completions created");
+        // console.log("chatThread.current:");
+        // console.log(chatThread.current);
         for await (const chunk of reply0) {
           // console.log("1-5 Chunk...");
           try {
@@ -238,13 +295,25 @@ export default function Home() {
               usage = chunk.usage;
             }
             updateLastMessage(curMessage);
-            const finalMessage = await engine.getMessage();
+            let finalMessage = await engine.getMessage();
+            const femalePrifx = "Female Character: ";
+            const malePrifx = "Male Character: ";
+            if (isRoleOne.current === true){
+              if (!finalMessage.trim ().startsWith(femalePrifx)) {
+                finalMessage = femalePrifx + finalMessage;
+              }
+
+            } else {
+              if (!finalMessage.trim ().startsWith(malePrifx)) {
+                finalMessage = malePrifx + finalMessage;
+              }
+            }
             if (usage) {
               onFinishGenerating(finalMessage, usage);
               chatThread.current = [...chatThread.current, { role: 'assistant', content: finalMessage }];
             }
-            console.log("Run Engine check 8: ChatThread display");
-            console.log(chatThread.current);
+            // console.log("Run Engine check before 8: ChatThread display");
+            // console.log(chatThread.current);
           } catch (e) {
             // console.log(e);
           }
@@ -262,8 +331,6 @@ export default function Home() {
         return;
       }
       // 记得一轮运行完成之后 isRunning.current = false;
-    console.log("Run Engine check 8: End");
-    console.log(chatThread.current);
     isRunning.current = false;
   }
   }
@@ -274,32 +341,6 @@ export default function Home() {
   // const modelLibName = "Llama-3_1-8B-Instruct-q4f32_1-ctx4k_cs1k-webgpu.wasm";
   const modelUrl = "https://huggingface.co/oopus/L3.1-Niitorm-8B-DPO-t0.0001-MLC";
   const modelLibName = "L3.1-Niitorm-8B-DPO-t0.0001-q4f32_1-webgpu.wasm";
-  const systemPromptContent = `
-
-  You are generating a romantic conversation between a **Female Character** and a **Male Character**.
-
-  **Conversation Rules:**
-  - Alternate between the female and male characters.
-  - Each response should include:
-    - A line of dialogue from the character.
-    - A brief description of their inner thoughts and feelings.
-  - Do not include any other content or repeat these instructions.
-  - Keep the conversation natural and engaging.
-
-  **Character Profiles:**
-
-  **Female Character:**
-    - Personality: Curious, shy with strangers, flirty, bubbly with friends.
-    - Expresses love through gentle, intimate touches, feeling at ease with the man.
-
-  **Male Character:**
-    - Personality: Flirty, witty, engaging, knowledgeable, insightful.
-    - Responds with tender gestures, cherishing close moments with the woman.
-
-  **Language:** 
-    - Chinese (Simplified)
-  `; 
-  const systemPrompt = [{ role: 'system', content: systemPromptContent} as ChatCompletionMessageParam];
   const selectedModel = modelUrl.split("/").pop() || "";
   // for oopus's model
   const modelLib = modelUrl + "/resolve/main/" + modelLibName;
@@ -307,30 +348,49 @@ export default function Home() {
   // const modelLib = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/" + modelLibName;
 
   const scenario = `
-    Please start an imaginative and engaging conversation between the female and male characters as described.
+    Start an conversation inspired by a narrative from a **female** perspective.
   `;
-
 
   const femalePrompt = `
-    Respond in character as a female persona with the specified personality traits. Base each response on the previous interaction, using her unique tone, expressions, and perspective.
+    Continoue the conversation in character as a **female** persona with the specified personality traits. Using her unique tone, expressions, and perspective. Gradually incorporate personal anecdotes, questions, or thoughts that deepen emotional intimacy. Keep the **conversation short**.
   `;
   const malePrompt = `
-    Respond in character as a male persona with the specified personality traits. Base each response on the previous interaction, using her unique tone, expressions, and perspective.
+    Continoue the conversation in character as a **male** persona with the specified personality traits. Using his unique tone, expressions, and perspective. Gradually incorporate personal anecdotes, questions, or thoughts that deepen emotional intimacy. Keep the **conversation short**.
   `;
 
-  const testPromptList = [scenario, '', '', '', '', '', '', '', '', '', ''];
+  const boosterMale = `
+    Create a single-sentence dialogue without repeating to propose your relationship or body interaction to the next level as a **male** persona with the specified personality traits. Using his unique tone, expressions, and perspective. Gradually incorporate personal anecdotes, questions, or thoughts that deepen emotional intimacy.
+  `
 
-  // const testPromptList = [femalePrompt + scenario, malePrompt, 
-  //                         femalePrompt, malePrompt, 
-  //                         femalePrompt, malePrompt, 
-  //                         femalePrompt, malePrompt,
-  //                         femalePrompt, malePrompt, 
-  //                         femalePrompt, malePrompt, 
-  //                         femalePrompt, malePrompt, 
-  //                         femalePrompt, malePrompt, 
-  //                         femalePrompt, malePrompt, 
-  //                         femalePrompt, malePrompt, 
-  //                         femalePrompt, malePrompt];
+  const boosterFemale = `
+    Create a single-sentence dialogue without repeating to propose your relationship or body interaction to the next level as a **female** persona with the specified personality traits. Using her unique tone, expressions, and perspective. Gradually incorporate personal anecdotes, questions, or thoughts that deepen emotional intimacy.
+  `;
+
+
+  // const testPromptList = [scenario, malePrompt, 
+  //   femalePrompt, malePrompt, 
+  //   femalePrompt, malePrompt, 
+  //   femalePrompt, malePrompt,
+  //   femalePrompt, malePrompt, 
+  //   femalePrompt, malePrompt, 
+  //   femalePrompt, malePrompt, 
+  //   femalePrompt, malePrompt, 
+  //   femalePrompt, malePrompt, 
+  //   femalePrompt, malePrompt, 
+  //   femalePrompt, malePrompt];
+
+  const testPromptList = [scenario, boosterMale, 
+    boosterFemale, boosterMale, 
+    boosterFemale, boosterMale, 
+    boosterFemale, boosterMale,
+    boosterFemale, boosterMale, 
+    boosterFemale, boosterMale, 
+    boosterFemale, boosterMale, 
+    boosterFemale, boosterMale, 
+    boosterFemale, boosterMale, 
+    boosterFemale, boosterMale, 
+    boosterFemale, boosterMale];
+
   const runPause = async () => {
     if (isPlaying) {
       stopTrigger.current = true;
