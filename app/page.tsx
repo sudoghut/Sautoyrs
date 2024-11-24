@@ -213,12 +213,13 @@ export default function Home() {
     You are creating a romantic story.
     
     **Conversation Guidelines:**  
-    - Language Setting: ${language.current}.
+    - Language setting: ${language.current}.
     - Culture background: ${language.current}.
     - Maintain an engaging tone that aligns with the character's profile.  
     - Don't translate.
     - Generate the story directly without any explanation or additional commentary about personality traits, generation approach, or reasoning.
 
+    ** persona: **
     `;
     // const systemPromptContentFemale = `   
     // **Female Character:**  
@@ -241,9 +242,8 @@ export default function Home() {
     } else if (isRoleOne.current === 1) {
       systemPromptContent += secondPersona.current;
     } else if (isRoleOne.current === 2) {
-      systemPromptContent = systemNarrator;
+      systemPromptContent = systemPromptContent.replace("** persona: **", "");
     }
-      // systemPrompt = [{ role: 'system', content: systemPromptContent} as ChatCompletionMessageParam];
     chatThread.current = [];
     const systemPrompt = [{ role: 'system', content: systemPromptContent} as ChatCompletionMessageParam];
     chatThread.current = [... systemPrompt];
@@ -370,18 +370,15 @@ export default function Home() {
                 finalMessage = narratorPrefix + finalMessage;
               }
             }
-            // if firstPersona.current and the secondPersona.current are "", update the firstPersona.current by finalMessage
-            // if firstPersona.current is not "" and the secondPersona.current is "", update the secondPersona.current by finalMessage
-            
-            if (firstPersona.current === "" && secondPersona.current === "") {
-              firstPersona.current = finalMessage;
-            } else if (firstPersona.current !== "" && secondPersona.current === "") {
-              secondPersona.current = finalMessage;
-            }
-            
             if (usage) {
+              // Generation finished
               onFinishGenerating(finalMessage, usage);
               // chatThread.current = [...chatThread.current, { role: 'assistant', content: finalMessage }];
+              if (firstPersona.current === "" && secondPersona.current === "") {
+                firstPersona.current = finalMessage;
+              } else if (firstPersona.current !== "" && secondPersona.current === "") {
+                secondPersona.current = finalMessage;
+              }
             }
             // console.log("Run Engine check before 8: ChatThread display");
             // console.log(chatThread.current);
@@ -424,6 +421,7 @@ export default function Home() {
   // const modelLib = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/" + modelLibName;
 
   language.current = "简体中文";
+  // language.current = "English";
   const scenario = `
     As a narrator, create a brief, natural, and random culture backgroud and scenario for a couple using **${language.current}**.
   `;
@@ -442,10 +440,10 @@ export default function Home() {
     Create a nature reaction using **${language.current}** for the next step to propose your relationship or body interaction to the next level as a **female**.
   `;
   const createFemaleCharacter = `
-    Create a concise, clear, and attractive persona for a female.
+    Create a concise, clear, and attractive persona profile for a female.
   `;
   const createMaleCharacter = `
-    Create a concise, clear, and attractive persona for a male.
+    Create a concise, clear, and attractive persona profile for a male.
   `;
   const narrator = `
     Describe a brief narrative outlining the next step in the interaction between a female character and a male character. Focus on deepening sexual interaction between the characters.
