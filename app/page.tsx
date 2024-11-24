@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { useRef } from 'react';
 import { 
   PlayCircle, 
@@ -8,11 +8,11 @@ import {
   Undo,
   FastForward,
   Rewind,
-  Settings
+  Settings,
+  ChartNoAxesColumnIcon
 } from 'lucide-react';
 import * as webllm from "@mlc-ai/web-llm";
 import { ChatCompletionMessageParam } from '@mlc-ai/web-llm';
-import { Role } from '@mlc-ai/web-llm/lib/config';
 
 function setLabel(id: string, text: string) {
   const label = document.getElementById(id);
@@ -24,10 +24,13 @@ function setLabel(id: string, text: string) {
 
 
 export default function Home() {
+  const language = useRef("");
+  const firstPersona = useRef("");
+  const secondPersona = useRef("");
   const stopTrigger = useRef(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const isRunning = useRef(false);
-  // The initial role as narrator won't trigger this role, as the first loop will push the role to the next one, which is female
+  // The initial role as narrator won't trigger this role, as the first loop will push the role to the next one, which is female.
   const isRoleOne = useRef(2);
   const chatThread = useRef<ChatCompletionMessageParam[]>([]);
   const engineRef = useRef<webllm.MLCEngineInterface | null>(null);
@@ -62,7 +65,7 @@ export default function Home() {
         temperature: llmTemp,
         top_p: llmTopP,
         // max_new_tokens: 100,
-        sliding_window_size: 1000,
+        sliding_window_size: 1500,
         attention_sink_size: 0,
       },
 
@@ -103,148 +106,82 @@ export default function Home() {
     }
   }
 
-  let lastMessageType: 'user' | 'assistant' | null = null;
+  let lastMessageType: 'user' | 'assistant' | null = 'user';
 
-  //Check from here!!!
-  function appendMessage(message: ChatCompletionMessageParam) {
-    const chatBox = document.getElementById("chat-box");
-    const container = document.createElement("div");
-    container.classList.add("message-container");
-
-    // Use the actual role from the message
-    let currentMessageType: 'user' | 'assistant' | null = 
-      message.role === 'user' || message.role === 'assistant'  
-      ? message.role 
-      : null;
-
-    // Assign classes based on the actual role
-    if (currentMessageType === 'user') {
-        container.classList.add("user");
-    } else if (currentMessageType === 'assistant') {
-        container.classList.add("assistant");
-    }
-
-    // Styling based on isRoleOne.current
-    if (isRoleOne.current === 0) { 
+  async function appendMessage(message: ChatCompletionMessageParam) {
+      const chatBox = document.getElementById("chat-box");
+      const container = document.createElement("div");
+      container.classList.add("message-container");
+  
+      let currentMessageType: 'user' | 'assistant' | null = 
+        lastMessageType === 'user' || lastMessageType === 'assistant'
+        ? lastMessageType
+        : null;
+      if (currentMessageType === 'user'){
+        container.classList.add('user');
+      } else if (currentMessageType === 'assistant'){
+        container.classList.add('assistant');
+      }
+      // console.log("currentMessageType:");
+      // console.log(currentMessageType);
+      // console.log("lastMessageType:");
+      // console.log(lastMessageType);
+      if (isRoleOne.current === 0) { 
         container.classList.add(
-            "bg-gradient-to-r",
-            "from-green-500/10",
-            "to-green-600/10",
-            "border-l-4",
-            "border-green-500",
-            "p-4");
-    } else if (isRoleOne.current === 1) {
+          "bg-gradient-to-r",
+          "from-green-500/10",
+          "to-green-600/10",
+          "border-l-4",
+          "border-green-500",
+          "p-4");
+        } else if (isRoleOne.current === 1) {
         container.classList.add(
-            "bg-gradient-to-r",
-            "from-blue-500/10",
-            "to-blue-600/10",
-            "border-l-4",
-            "border-blue-500",
-            "p-4");
-    } else if (isRoleOne.current === 2) {
+          "bg-gradient-to-r",
+          "from-blue-500/10",
+          "to-blue-600/10",
+          "border-l-4",
+          "border-blue-500",
+          "p-4");
+        } else if (isRoleOne.current === 2) {
         container.classList.add(
-            "bg-gradient-to-r",
-            "from-gray-500/10",
-            "to-gray-600/10",
-            "border-l-4",
-            "border-gray-500",
-            "p-4");
-    }
+          "bg-gradient-to-r",
+          "from-gray-500/10",
+          "to-gray-600/10",
+          "border-l-4",
+          "border-gray-500",
+          "p-4");
+        };
 
-    const newMessage = document.createElement("div");
-    newMessage.classList.add("message");
-    newMessage.textContent = typeof message.content === 'string' ? message.content : '';
-
-    // Text color based on isRoleOne.current
-    if (isRoleOne.current === 0) { 
+  
+      const newMessage = document.createElement("div");
+      newMessage.classList.add("message");
+      newMessage.textContent = typeof message.content === 'string' ? message.content : '';
+      if (isRoleOne.current === 0) { 
+        // Female role
         newMessage.classList.add("text-green-400");
-    } else if (isRoleOne.current === 1) { 
+      } else if (isRoleOne.current === 1) { 
+        // Male role
         newMessage.classList.add("text-blue-400");
-    } else if (isRoleOne.current === 2) { 
+      } else if (isRoleOne.current === 2) { 
+        // Narrator role
         newMessage.classList.add("text-gray-400");
-    }
+      }    
 
-    container.appendChild(newMessage);
-    if (chatBox) {
-        chatBox.appendChild(container);
-        scrollToBottom();
-    }
-
-    // Update the last message type if needed
-    lastMessageType = currentMessageType;
-}
-
-
-  // function appendMessage(message: ChatCompletionMessageParam) {
-  //     const chatBox = document.getElementById("chat-box");
-  //     const container = document.createElement("div");
-  //     container.classList.add("message-container");
+      container.appendChild(newMessage);
+      if (chatBox) {
+          chatBox.appendChild(container);
+          scrollToBottom();
+      }
   
-  //     let currentMessageType: 'user' | 'assistant';
-  
-  //     if (lastMessageType === null || lastMessageType === 'assistant') {
-  //         currentMessageType = 'user';
-  //         container.classList.add("user");
-
-  //     } else {
-  //         currentMessageType = 'assistant';
-  //         container.classList.add("assistant");
-  //     }
-  //     // console.log("currentMessageType:");
-  //     // console.log(currentMessageType);
-  //     // console.log("lastMessageType:");
-  //     // console.log(lastMessageType);
-  //     if (isRoleOne.current === 0) { 
-  //       container.classList.add(
-  //         "bg-gradient-to-r",
-  //         "from-green-500/10",
-  //         "to-green-600/10",
-  //         "border-l-4",
-  //         "border-green-500",
-  //         "p-4");
-  //       } else if (isRoleOne.current === 1) {
-  //       container.classList.add(
-  //         "bg-gradient-to-r",
-  //         "from-blue-500/10",
-  //         "to-blue-600/10",
-  //         "border-l-4",
-  //         "border-blue-500",
-  //         "p-4");
-  //       } else if (isRoleOne.current === 2) {
-  //       container.classList.add(
-  //         "bg-gradient-to-r",
-  //         "from-gray-500/10",
-  //         "to-gray-600/10",
-  //         "border-l-4",
-  //         "border-gray-500",
-  //         "p-4");
-  //       };
-
-  
-  //     const newMessage = document.createElement("div");
-  //     newMessage.classList.add("message");
-  //     if (isRoleOne.current === 0) { 
-  //       // Female role
-  //       newMessage.classList.add("text-green-400");
-  //     } else if (isRoleOne.current === 1) { 
-  //       // Male role
-  //       newMessage.classList.add("text-blue-400");
-  //     } else if (isRoleOne.current === 2) { 
-  //       // Narrator role
-  //       newMessage.classList.add("text-gray-400");
-  //     }    
-  
-  //     newMessage.textContent = typeof message.content === 'string' ? message.content : '';
-  
-  //     container.appendChild(newMessage);
-  //     if (chatBox) {
-  //         chatBox.appendChild(container);
-  //         scrollToBottom();
-  //     }
-  
-  //     // Update the last message type
-  //     lastMessageType = currentMessageType;
-  // }
+      // Update the last message type
+      lastMessageType = currentMessageType;
+      // switch  currentMessageType
+      if (currentMessageType === 'user') {
+        lastMessageType = 'assistant';
+      } else if (currentMessageType === 'assistant') {
+        lastMessageType = 'user';
+      } 
+  }
   async function updateChatThreadFromDom(): Promise<ChatCompletionMessageParam[]> {
     const chatBox = document.getElementById("chat-box");
     let tempChatThread: ChatCompletionMessageParam[] = [];
@@ -252,18 +189,16 @@ export default function Home() {
       const messageContainers = chatBox.querySelectorAll(".message-container");
       tempChatThread = await Promise.all(
           Array.from(messageContainers).map(async (container) => {
-              const role = container.classList.contains("assistant") ? "assistant" :
-                           container.classList.contains("user") ? "user" : "unknown";
-              const messageDom = container.querySelector(".message");
-              const content = messageDom ? messageDom.textContent : "";
-
-              console.log(`!!!Read chatThread from DOM as ${role}:`, content);
-              return { role, content } as ChatCompletionMessageParam;
+            const role = container.classList.contains("assistant") ? "assistant" :
+                          container.classList.contains("user") ? "user" : "unknown";
+            const messageDom = container.querySelector(".message");
+            const content = messageDom ? messageDom.textContent : "";
+            return { role, content } as ChatCompletionMessageParam;
           })
       );
     }
-    console.log("tempChatThread:");
-    console.log(tempChatThread);
+    // console.log("tempChatThread:");
+    // console.log(tempChatThread);
     return tempChatThread;
 }
 
@@ -272,59 +207,46 @@ export default function Home() {
     updateLastMessage: (content: string) => void,
     onFinishGenerating: (finalMessage: string, usage: { prompt_tokens: number; completion_tokens: number; extra: { prefill_tokens_per_s: number; decode_tokens_per_s: number; } })
     => void,
-    firstMessageTest: string,
+    currentPrompt: string,
     ) {
-    let language = "Chinese (Simplified)";
     let systemPromptContent = `
-    You are generating a romantic conversation.
+    You are creating a romantic story.
     
     **Conversation Guidelines:**  
+    - Language Setting: ${language.current}.
+    - Culture background: ${language.current}.
+    - Maintain an engaging tone that aligns with the character's profile.  
+    - Don't translate.
+    - Generate the story directly without any explanation or additional commentary about personality traits, generation approach, or reasoning.
 
-    - Output Language:  ${language}.  
-    - Each response must include a line of dialogue spoken by the character.  
-    - Keep the tone engaging, and aligned with the characters' profile. 
-    
-    
-    **Character Profile:**  
-    
-    `
-    const systemPromptContentFemale = `   
-    **Female Character:**  
-    - **Personality:** Curious and shy with strangers but flirty and bubbly with friends.  
-    - **Expressions of Love:** Shows affection through gentle, intimate touches and feels comfortable in the man’s presence.
     `;
-    const systemPromptContentMale = `
-    **Male Character:**  
-    - **Personality:** Flirty, witty, and engaging.
-    - **Expressions of Love:** Responds with tender gestures, savoring close moments with the woman.  
-    `; 
+    // const systemPromptContentFemale = `   
+    // **Female Character:**  
+    // - **Personality:** Curious and shy with strangers but flirty and bubbly with friends.  
+    // - **Expressions of Love:** Shows affection through gentle, intimate touches and feels comfortable in the man’s presence.
+    // `;
+    // const systemPromptContentMale = `
+    // **Male Character:**  
+    // - **Personality:** Flirty, witty, and engaging.
+    // - **Expressions of Love:** Responds with tender gestures, savoring close moments with the woman.  
+    // `; 
     const systemNarrator = `
     Act as a narrator guiding the story's progression, focusing on deepening the relationship or body interaction between the female and male characters. Use a third-person narrative style to describe actions, emotions, and events, avoiding direct dialogue or conversation.
-    - Output Language:  ${language}. 
+    - Output Language:  ${language.current}. 
     `
 
     
     if (isRoleOne.current === 0) {
-      systemPromptContent += systemPromptContentFemale;
+      systemPromptContent += firstPersona.current;
     } else if (isRoleOne.current === 1) {
-      systemPromptContent += systemPromptContentMale;
+      systemPromptContent += secondPersona.current;
     } else if (isRoleOne.current === 2) {
       systemPromptContent = systemNarrator;
     }
       // systemPrompt = [{ role: 'system', content: systemPromptContent} as ChatCompletionMessageParam];
     chatThread.current = [];
     const systemPrompt = [{ role: 'system', content: systemPromptContent} as ChatCompletionMessageParam];
-    console.log("systemPrompt:");
-    console.log(systemPrompt);
     chatThread.current = [... systemPrompt];
-    console.log("[...systemPrompt]:");
-    console.log([... systemPrompt]);
-
-    console.log("chatThread.current before Run Engine check 1:");
-    console.log(chatThread.current);
-    console.log("Run Engine check 1: Start");
-    console.log("chatThread.current:");
-    console.log(chatThread.current);
     if (isRunning.current) {
       return;
     }
@@ -336,22 +258,15 @@ export default function Home() {
     if (engineRef.current === null) {
     // if (1 === 1) {
       console.log("Before Run Engine check 3: Engine initialized - unchecked");
-      console.log("chatThread.current:");
-      console.log(chatThread.current);
-      engine = await initializeWebLLMEngine(modelName, modelLib, modelUrl, 0.1, 0.5);
+      engine = await initializeWebLLMEngine(modelName, modelLib, modelUrl, 0.8, 0.5);
       console.log("Run Engine check 3: Engine initialized - unchecked");
       console.log("chatThread.current:");
       console.log(chatThread.current);
       if (engine !== null) {
         console.log("Run Engine check 4: Engine initialized - checked");
-        console.log("chatThread.current:");
-        console.log(chatThread.current);
         engineRef.current = engine;
       }else{
         console.log("Run Engine check 4: Engine not initialized");
-        console.log("chatThread.current:");
-        console.log(chatThread.current);
-        isRunning.current = false;
         setIsPlaying(false);
         return;
       }
@@ -361,22 +276,20 @@ export default function Home() {
     }
     if (engine !== null) {
       console.log("Run Engine check 5: Ready to run");
-      console.log("chatThread.current:");
-      console.log(chatThread.current);
       try {
         let curMessage = "";
         
         const chatBox = document.getElementById("chat-box");
         if (chatBox) {
-          console.log("Before Run Engine check 5.1 chatThread.current:");
-          console.log(chatThread.current);
+          // console.log("Before Run Engine check 5.1 chatThread.current:");
+          // console.log(chatThread.current);
           const tempChatThread = await updateChatThreadFromDom();
           // assign tempChatThread to chatThread.current
           chatThread.current = tempChatThread;
           console.log("Run Engine check 5.1: Chatbox create");
           console.log("chatThread.current:");
           console.log(chatThread.current);
-          const newMessage: ChatCompletionMessageParam = { role: 'user', content: firstMessageTest };
+          const newMessage: ChatCompletionMessageParam = { role: 'user', content: currentPrompt };
           chatThread.current.push(newMessage);
           chatThread.current = [... systemPrompt, ... chatThread.current];
           // Hide in instruction
@@ -385,17 +298,21 @@ export default function Home() {
           console.log("Run Engine check 5.1: Chatbox not created");
         }
         let usage;
+        // //test from here
         let shortConversation;
         // First round, it will only have systemPrompt, senario prompt, so we don't need to change the conversation length
         // From the second round, we will only keep systemPrompt and the last two messages
         const memoryLength = 2;
         // plus 2 is for the systemPrompt and the current instruct prompt
         if (chatThread.current.length > memoryLength+2) {
-          shortConversation = [... systemPrompt, ... chatThread.current.slice(-(memoryLength+2-1))];
+          // shortConversation = [... systemPrompt, ... chatThread.current.slice(-(memoryLength+2-1))];
+          shortConversation = [... systemPrompt, ...structuredClone(chatThread.current.slice(-(memoryLength + 2 - 1)))];
         } else {
-          shortConversation = [... chatThread.current];
+          // shortConversation = [... chatThread.current];
+          shortConversation = [... structuredClone(chatThread.current)];
         }
-        const newRoleSetting = ['system', "user", "assistant", "user"];
+        // const newRoleSetting = ['system', "user", "assistant", "user"];
+        const newRoleSetting = ['system', "assistant", "user", "assistant", "user"];
         // reset "role" in shortConversation by newRoleSetting
         // currentNewRoleSetting is first get the first n. Then, based on the length of shortConversation, get role from the right side of newRoleSetting
         const currentNewRoleSetting = [
@@ -404,12 +321,16 @@ export default function Home() {
         ];
         console.log("currentNewRoleSetting:");
         console.log(currentNewRoleSetting);
-        shortConversation.forEach((message, index) => {
+        // shortConversation.forEach((message, index) => {
+        //   message.role = currentNewRoleSetting[index] as "user" | "assistant" | "system" | "tool";
+        // });
+        await Promise.all(shortConversation.map(async (message, index) => {
           message.role = currentNewRoleSetting[index] as "user" | "assistant" | "system" | "tool";
-        });
+        }));
         console.log("Run Engine check 6: chatThread ready to run");
         console.log("shortConversation:");
         console.log(shortConversation);
+        // // test ends here
         const reply0 = await engine.chat.completions.create({
           // messages: chatThread.current,
           messages: shortConversation,
@@ -417,7 +338,7 @@ export default function Home() {
           stream_options: { include_usage: true },
         });
         const assistantMessage: ChatCompletionMessageParam = { role: 'assistant', content: 'Generating...' };
-        appendMessage(assistantMessage);
+        await appendMessage(assistantMessage);
         // console.log("Run Engine check 7: Completions created");
         // console.log("chatThread.current:");
         // console.log(chatThread.current);
@@ -448,6 +369,14 @@ export default function Home() {
               if (!finalMessage.trim().startsWith(narratorPrefix)) {
                 finalMessage = narratorPrefix + finalMessage;
               }
+            }
+            // if firstPersona.current and the secondPersona.current are "", update the firstPersona.current by finalMessage
+            // if firstPersona.current is not "" and the secondPersona.current is "", update the secondPersona.current by finalMessage
+            
+            if (firstPersona.current === "" && secondPersona.current === "") {
+              firstPersona.current = finalMessage;
+            } else if (firstPersona.current !== "" && secondPersona.current === "") {
+              secondPersona.current = finalMessage;
             }
             
             if (usage) {
@@ -484,16 +413,19 @@ export default function Home() {
   // const modelLibName = "RedPajama-INCITE-Chat-3B-v1-q4f16_1-webgpu.wasm";
   // const modelUrl = "https://huggingface.co/mlc-ai/Llama-3.1-8B-Instruct-q4f32_1-MLC";
   // const modelLibName = "Llama-3_1-8B-Instruct-q4f32_1-ctx4k_cs1k-webgpu.wasm";
-  const modelUrl = "https://huggingface.co/oopus/L3.1-Niitorm-8B-DPO-t0.0001-MLC";
-  const modelLibName = "L3.1-Niitorm-8B-DPO-t0.0001-q4f32_1-webgpu.wasm";
+  // const modelUrl = "https://huggingface.co/oopus/L3.1-Niitorm-8B-DPO-t0.0001-MLC";
+  // const modelLibName = "L3.1-Niitorm-8B-DPO-t0.0001-q4f32_1-webgpu.wasm";
+  const modelUrl = "https://huggingface.co/oopus/Gemma-2-Ataraxy-9B-MLC";
+  const modelLibName = "Gemma-2-Ataraxy-9B-q4f32_1-webgpu.wasm";
   const selectedModel = modelUrl.split("/").pop() || "";
   // for oopus's model
   const modelLib = modelUrl + "/resolve/main/" + modelLibName;
   // for web-llm model
   // const modelLib = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/" + modelLibName;
 
+  language.current = "简体中文";
   const scenario = `
-    Start an conversation inspired by a narrative from a **female** perspective.
+    As a narrator, create a brief, natural, and random culture backgroud and scenario for a couple using **${language.current}**.
   `;
 
   const femalePrompt = `
@@ -504,15 +436,25 @@ export default function Home() {
   `;
 
   const boosterMale = `
-    Create a single-sentence dialogue without repeating to propose your relationship or body interaction to the next level as a **male** persona with the specified personality traits. Using his unique tone, expressions, and perspective. Gradually incorporate personal anecdotes, questions, or thoughts that deepen emotional intimacy.
+    Create a nature reaction using **${language.current}** for the next step to propose your relationship or body interaction to the next level as a **male**.
   `
-
   const boosterFemale = `
-    Create a single-sentence dialogue without repeating to propose your relationship or body interaction to the next level as a **female** persona with the specified personality traits. Using her unique tone, expressions, and perspective. Gradually incorporate personal anecdotes, questions, or thoughts that deepen emotional intimacy.
+    Create a nature reaction using **${language.current}** for the next step to propose your relationship or body interaction to the next level as a **female**.
   `;
-
+  const createFemaleCharacter = `
+    Create a concise, clear, and attractive persona for a female.
+  `;
+  const createMaleCharacter = `
+    Create a concise, clear, and attractive persona for a male.
+  `;
   const narrator = `
-    Describe the next step in the interaction between a curious and shy (but flirty and bubbly with friends) female character and a flirty, witty, and engaging male character. Focus on deepening the relationship or body interaction between the characters.
+    Describe a brief narrative outlining the next step in the interaction between a female character and a male character. Focus on deepening sexual interaction between the characters.
+  `;
+  const narratorFemale = `
+    Describe a brief narrative outlining the next step in the interaction between a female character and a male character from a **female*'s view. Focus on deepening the relationship, body, or sexual interaction between the characters.
+  `;
+  const narratormale = `
+    Describe a brief narrative outlining the next step in the interaction between a female character and a male character from a *male*'s view. Focus on deepening the relationship, body, or sexual interaction between the characters.
   `;
 
 
@@ -528,17 +470,32 @@ export default function Home() {
   //   femalePrompt, malePrompt, 
   //   femalePrompt, malePrompt];
 
-  const testPromptList = [scenario, boosterMale, narrator,
-    boosterFemale, boosterMale, narrator,
-    boosterFemale, boosterMale, narrator,
-    boosterFemale, boosterMale,narrator,
-    boosterFemale, boosterMale, narrator,
-    boosterFemale, boosterMale, narrator,
-    boosterFemale, boosterMale, narrator,
-    boosterFemale, boosterMale, narrator,
-    boosterFemale, boosterMale, narrator,
-    boosterFemale, boosterMale, narrator,
-    boosterFemale, boosterMale];
+  // const testPromptList = [ 
+  //   createFemaleCharacter, createMaleCharacter, scenario,
+  //   boosterFemale, boosterMale, narrator,
+  //   boosterFemale, boosterMale, narrator,
+  //   boosterFemale, boosterMale, narrator,
+  //   boosterFemale, boosterMale, narrator,
+  //   boosterFemale, boosterMale, narrator,
+  //   boosterFemale, boosterMale, narrator,
+  //   boosterFemale, boosterMale, narrator,
+  //   boosterFemale, boosterMale, narrator,
+  //   boosterFemale, boosterMale, narrator,
+  //   boosterFemale, boosterMale];
+
+    const testPromptList = [ 
+      createFemaleCharacter, createMaleCharacter, scenario,
+      narratorFemale, narratormale, narrator,
+      narratorFemale, narratormale, narrator,
+      narratorFemale, narratormale, narrator,
+      narratorFemale, narratormale, narrator,
+      narratorFemale, narratormale, narrator,
+      narratorFemale, narratormale, narrator,
+      narratorFemale, narratormale, narrator,
+      narratorFemale, narratormale, narrator,
+      narratorFemale, narratormale, narrator,
+      narratorFemale, narratormale];
+  
 
   const runPause = async () => {
     if (isPlaying) {
@@ -554,11 +511,8 @@ export default function Home() {
   
     setIsPlaying(true);
     updateStatusLabel("Running...");
-    let counter = 0
+
     for (const testPrompt of testPromptList) {
-      counter += 1;
-      console.log("counter:");
-      console.log(counter);
       if (stopTrigger.current) {
         const playButton = document.getElementById("play-button");
         if (playButton) {
