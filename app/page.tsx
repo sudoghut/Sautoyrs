@@ -1,15 +1,10 @@
 "use client"
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRef } from 'react';
 import { 
   PlayCircle, 
   StopCircle, 
-  Infinity,
-  Undo,
-  FastForward,
-  Rewind,
   Settings,
-  ChartNoAxesColumnIcon,
 } from 'lucide-react';
 import * as webllm from "@mlc-ai/web-llm";
 import { ChatCompletionMessageParam } from '@mlc-ai/web-llm';
@@ -25,15 +20,20 @@ function setLabel(id: string, text: string) {
 
 
 export default function Home() {
-  const [showModal, setshowModal] = useState(true);
+  const [character1Gender, setCharacter1Gender] = useState('');
+  const [character2Gender, setCharacter2Gender] = useState('');
+  const [language, setLanguage] = useState('');
+  const [storyBackground, setStoryBackground] = useState('');
+  const [is18Plus, setIs18Plus] = useState(false);
 
-  const character1GenderRef = useRef<HTMLSelectElement | null>(null);
-  const character2GenderRef = useRef<HTMLSelectElement | null>(null);
-  const languageRef = useRef<HTMLSelectElement | null>(null);
-  const storyBackgroundRef = useRef<HTMLTextAreaElement | null>(null);
-  const is18PlusRef = useRef<HTMLInputElement | null>(null);
+  // For loading page async issue
+  const character1GenderRef = useRef('');
+  const character2GenderRef = useRef('');
+  const languageRef = useRef('');
+  const storyBackgroundRef = useRef('');
+  const is18PlusRef = useRef(false);
 
-  const language = useRef("");
+  const [showModal, setshowModal] = useState(false);
   const firstPersona = useRef("");
   const secondPersona = useRef("");
   const stopTrigger = useRef(false);
@@ -222,8 +222,8 @@ export default function Home() {
     You are creating a romantic story.
     
     **Conversation Guidelines:**  
-    - Language setting: ${language.current}.
-    - Culture background: ${language.current}.
+    - Language setting: ${language}.
+    - Culture background: ${language}.
     - Maintain an engaging tone that aligns with the character's profile.  
     - Don't translate.
     - Generate the story directly without any explanation or additional commentary about personality traits, generation approach, or reasoning.
@@ -242,7 +242,7 @@ export default function Home() {
     // `; 
     const systemNarrator = `
     Act as a narrator guiding the story's progression, focusing on deepening the relationship or body interaction between the female and male characters. Use a third-person narrative style to describe actions, emotions, and events, avoiding direct dialogue or conversation.
-    - Output Language:  ${language.current}. 
+    - Output Language:  ${language}. 
     `
 
     
@@ -429,10 +429,9 @@ export default function Home() {
   // for web-llm model
   // const modelLib = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/" + modelLibName;
 
-  language.current = "简体中文";
   // language.current = "English";
   const scenario = `
-    As a narrator, create a brief, natural, and random culture backgroud and scenario for a couple using **${language.current}**.
+    As a narrator, create a brief, natural, and random culture backgroud and scenario for a couple using **${language}**.
   `;
 
   const femalePrompt = `
@@ -443,10 +442,10 @@ export default function Home() {
   `;
 
   const boosterMale = `
-    Create a nature reaction using **${language.current}** for the next step to propose your relationship or body interaction to the next level as a **male**.
+    Create a nature reaction using **${language}** for the next step to propose your relationship or body interaction to the next level as a **male**.
   `
   const boosterFemale = `
-    Create a nature reaction using **${language.current}** for the next step to propose your relationship or body interaction to the next level as a **female**.
+    Create a nature reaction using **${language}** for the next step to propose your relationship or body interaction to the next level as a **female**.
   `;
   const createFemaleCharacter = `
     Create a concise, clear, and attractive persona profile for a female.
@@ -549,75 +548,67 @@ export default function Home() {
 
   const checkModalClose = () => {
     if (
-      character1GenderRef.current?.value &&
-      character2GenderRef.current?.value &&
-      languageRef.current?.value &&
-      is18PlusRef.current?.checked
+      character1Gender &&
+      character2Gender &&
+      language &&
+      is18Plus
     ) {
-        setshowModal(false);
-        Cookies.set('character1Gender', character1GenderRef.current.value, { expires: 365 });
-        Cookies.set('character2Gender', character2GenderRef.current.value, { expires: 365 });
-        Cookies.set('language', languageRef.current.value, { expires: 365 });
-        Cookies.set('is18Plus', is18PlusRef.current.checked.toString(), { expires: 365 });
-        if (storyBackgroundRef.current) {
-          Cookies.set('storyBackground', storyBackgroundRef.current.value, { expires: 365 });
-        }
+      Cookies.set('character1Gender', character1Gender, { expires: 365 });
+      Cookies.set('character2Gender', character2Gender, { expires: 365 });
+      Cookies.set('language', language, { expires: 365 });
+      Cookies.set('is18Plus', is18Plus.toString(), { expires: 365 });
+      if (storyBackground) {
+        Cookies.set('storyBackground', storyBackground, { expires: 365 });
+      }
+      setshowModal(false);
     } else {
       setshowModal(true);
+    }
+
+    // For loading page async issue
+    if (character1GenderRef.current && character2GenderRef.current && languageRef.current && is18PlusRef.current) {
+      setshowModal(false);
     }
   };
 
   useEffect(() => {
-    const character1Gender = Cookies.get('character1Gender');
-    const character2Gender = Cookies.get('character2Gender');
-    const language = Cookies.get('language');
-    const is18Plus = Cookies.get('is18Plus');
-    // console.log("character1Gender:");
-    // console.log(character1Gender);
-    // console.log("character2Gender:");
-    // console.log(character2Gender);
-    // console.log("language:");
-    // console.log(language);
-    // console.log("is18Plus:");
-    // console.log(is18Plus);
+    const character1GenderTemp = Cookies.get('character1Gender');
+    const character2GenderTemp = Cookies.get('character2Gender');
+    const languageTemp = Cookies.get('language');
+    const is18PlusTemp = Cookies.get('is18Plus');
+    const storyBackground = Cookies.get('storyBackground');
 
-    if (character1Gender && character1GenderRef.current) character1GenderRef.current.value = character1Gender;
-    if (character2Gender && character2GenderRef.current) character2GenderRef.current.value = character2Gender;
-    if (language && languageRef.current) languageRef.current.value = language;
-    if (is18Plus && is18PlusRef.current) is18PlusRef.current.checked = is18Plus === 'true';
-    if (storyBackgroundRef.current) {
-      const storyBackground = Cookies.get('storyBackground');
-      if (storyBackground) storyBackgroundRef.current.value = storyBackground;
-    }
-
-    checkModalClose();
+    // For loading page async issue
+    if (character1GenderTemp) character1GenderRef.current = character1GenderTemp;
+    if (character2GenderTemp) character2GenderRef.current = character2GenderTemp;
+    if (languageTemp) languageRef.current = languageTemp;
+    if (storyBackground) storyBackgroundRef.current = storyBackground;
+    if (is18PlusTemp) is18PlusRef.current = is18PlusTemp === 'true';
+  
+    if (character1GenderTemp) setCharacter1Gender(character1GenderTemp);
+    if (character2GenderTemp) setCharacter2Gender(character2GenderTemp);
+    if (languageTemp) setLanguage(languageTemp);
+    if (storyBackground) setStoryBackground(storyBackground);
+    if (is18PlusTemp) setIs18Plus(is18PlusTemp === 'true');
+  
+    setTimeout(checkModalClose, 0);
   }, []);
 
   const toggleModal = () => {
     if (!showModal) {
-      // Delay the setting of values to ensure refs are available
       setTimeout(() => {
-        const character1Gender = Cookies.get('character1Gender');
-        const character2Gender = Cookies.get('character2Gender');
-        const language = Cookies.get('language');
-        const is18Plus = Cookies.get('is18Plus');
-        const storyBackground = Cookies.get('storyBackground');
+        const character1GenderTemp = Cookies.get('character1Gender');
+        const character2GenderTemp = Cookies.get('character2Gender');
+        const languageTemp = Cookies.get('language');
+        const is18PlusTemp = Cookies.get('is18Plus');
   
-        if (character1Gender && character1GenderRef.current) {
-          character1GenderRef.current.value = character1Gender;
-        }
-        if (character2Gender && character2GenderRef.current) {
-          character2GenderRef.current.value = character2Gender;
-        }
-        if (language && languageRef.current) {
-          languageRef.current.value = language;
-        }
-        if (is18Plus && is18PlusRef.current) {
-          is18PlusRef.current.checked = is18Plus === 'true';
-        }
-        if (storyBackground && storyBackgroundRef.current) {
-          storyBackgroundRef.current.value = storyBackground;
-        }
+        if (character1GenderTemp) setCharacter1Gender(character1GenderTemp);
+        if (character2GenderTemp) setCharacter2Gender(character2GenderTemp);
+        if (languageTemp) setLanguage(languageTemp);
+        setIs18Plus(is18PlusTemp === 'true');
+
+        const storyBackgroundTemp = Cookies.get('storyBackground');
+        if (storyBackgroundTemp) setStoryBackground(storyBackgroundTemp);
       }, 0);
     }
     setshowModal(!showModal);
@@ -632,7 +623,9 @@ return (
       <h2 className="text-2xl font-bold mb-4 text-purple-300">Settings</h2>
       <div className="mb-4">
         <label className="block mb-2 text-purple-200">Character 1 Biological Gender</label>
-        <select ref={character1GenderRef} className="w-full p-2 border rounded bg-gray-200 text-black border-purple-500">
+        <select value={character1Gender}
+                onChange={(e) => setCharacter1Gender(e.target.value)}
+                className="w-full p-2 border rounded bg-gray-200 text-black border-purple-500">
           <option value="" className="text-gray-500">Select</option>
           <option value="♂">♂ Male</option>
           <option value="♀">♀ Female</option>
@@ -640,7 +633,9 @@ return (
       </div>
       <div className="mb-4">
         <label className="block mb-2 text-purple-200">Character 2 Biological Gender</label>
-        <select ref={character2GenderRef} className="w-full p-2 border rounded bg-gray-200 text-black border-purple-500">
+        <select value={character2Gender}
+                onChange={(e) => setCharacter2Gender(e.target.value)}
+                className="w-full p-2 border rounded bg-gray-200 text-black border-purple-500">
           <option value="" className="text-gray-500">Select</option>
           <option value="♂">♂ Male</option>
           <option value="♀">♀ Female</option>
@@ -648,17 +643,28 @@ return (
       </div>
       <div className="mb-4">
         <label className="block mb-2 text-purple-200">Language</label>
-        <select ref={languageRef} className="w-full p-2 border rounded bg-gray-200 text-black border-purple-500">
+        <select value={language}
+                className="w-full p-2 border rounded bg-gray-200 text-black border-purple-500"
+                onChange={(e) => setLanguage(e.target.value)}>
           <option value="" className="text-gray-500">Select</option>
-          <option value="en">English</option>
-          <option value="es">Spanish</option>
-          <option value="fr">French</option>
+          <option value="ar (Arabic)">العربية (Arabic)</option>
+          <option value="de (German)">Deutsch (German)</option>
+          <option value="en (English)">English</option>
+          <option value="es (Spanish)">Español (Spanish)</option>
+          <option value="fr (French)">Français (French)</option>
+          <option value="hi (Hindi)">हिन्दी (Hindi)</option>
+          <option value="ja (Japanese)">日本語 (Japanese)</option>
+          <option value="pt (Portuguese)">Português (Portuguese)</option>
+          <option value="ru (Russian)">Русский (Russian)</option>
+          <option value="zh-CN (Simplified Chinese)">简体中文 (Chinese)</option>
+          <option value="zh-TW (Traditional Chinese)">正體中文 (Chinese)</option>
         </select>
       </div>
       <div className="mb-4">
         <label className="block mb-2 text-purple-200">Story Background (Optional)</label>
         <textarea 
-          ref={storyBackgroundRef} 
+          value={storyBackground} 
+          onChange={(e) => setStoryBackground(e.target.value)}
           className="w-full p-2 border rounded bg-gray-200 text-black border-purple-500 placeholder-gray-500" 
           rows={3}
           placeholder="Enter story background here..."
@@ -666,7 +672,10 @@ return (
       </div>
       <div className="mb-4">
         <label className="flex items-center text-purple-200">
-          <input type="checkbox" ref={is18PlusRef} className="mr-2 bg-gray-200 border-purple-500" />
+          <input type="checkbox"
+                  checked={is18Plus}
+                  onChange={(e) => setIs18Plus(e.target.checked)}
+                  className="mr-2 bg-gray-200 border-purple-500" />
           I am 18+ years old
         </label>
       </div>
@@ -688,7 +697,7 @@ return (
     <div className="chat-container mb-8 bg-gray-800 rounded-lg p-4 shadow-inner border border-purple-500/20">
       <div
         id="chat-box"
-        className="h-[50vh] overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-gray-700 overflow-x-hidden scroll-smooth"
+        className="h-[70vh] overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-gray-700 overflow-x-hidden scroll-smooth"
       >
       </div>
     </div>
@@ -710,42 +719,11 @@ return (
       </button>
 
       <button
-        onClick={() => setIsPlaying(true)}
+        onClick={() => toggleModal()}
         className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white hover:from-blue-400 hover:to-blue-500 transition-all duration-300 shadow-lg border border-blue-400/30 hover:scale-110 active:scale-95"
       >
-        <FastForward className="w-6 h-6 sm:w-8 sm:h-8" />
+        <Settings className="w-6 h-6 sm:w-8 sm:h-8" />
       </button>
-
-      <button
-        onClick={() => setIsPlaying(true)}
-        className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white hover:from-blue-400 hover:to-blue-500 transition-all duration-300 shadow-lg border border-blue-400/30 hover:scale-110 active:scale-95"
-      >
-        <Rewind className="w-6 h-6 sm:w-8 sm:h-8" />
-      </button>
-
-      <button
-        onClick={() => setIsPlaying(true)}
-        className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white hover:from-blue-400 hover:to-blue-500 transition-all duration-300 shadow-lg border border-blue-400/30 hover:scale-110 active:scale-95"
-      >
-        <Undo className="w-6 h-6 sm:w-8 sm:h-8" />
-      </button>
-
-      <button
-        onClick={() => setIsPlaying(false)}
-        className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center text-white hover:from-red-400 hover:to-red-500 transition-all duration-300 shadow-lg border border-red-400/30 hover:scale-110 active:scale-95"
-      >
-        <Infinity className="w-6 h-6 sm:w-8 sm:h-8" />
-      </button>
-
-      </div>
-      {/* Settings Button */}
-      <div className="flex justify-center">
-        <button
-          onClick={() => toggleModal()}
-          className="w-32 h-10 mt-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white hover:from-blue-400 hover:to-blue-500 transition-all duration-300 shadow-lg border border-blue-400/30 hover:scale-110 active:scale-95"
-        >
-          <Settings className="w-8 h-8" />
-        </button>
       </div>
     </div>
   </div>
