@@ -9,11 +9,10 @@ import {
   FastForward,
   Rewind,
   Settings,
-  ChartNoAxesColumnIcon,
+  ChartNoAxesColumnIcon
 } from 'lucide-react';
 import * as webllm from "@mlc-ai/web-llm";
 import { ChatCompletionMessageParam } from '@mlc-ai/web-llm';
-import Cookies from 'js-cookie';
 
 function setLabel(id: string, text: string) {
   const label = document.getElementById(id);
@@ -25,14 +24,6 @@ function setLabel(id: string, text: string) {
 
 
 export default function Home() {
-  const [showModal, setshowModal] = useState(true);
-
-  const character1GenderRef = useRef<HTMLSelectElement | null>(null);
-  const character2GenderRef = useRef<HTMLSelectElement | null>(null);
-  const languageRef = useRef<HTMLSelectElement | null>(null);
-  const storyBackgroundRef = useRef<HTMLTextAreaElement | null>(null);
-  const is18PlusRef = useRef<HTMLInputElement | null>(null);
-
   const language = useRef("");
   const firstPersona = useRef("");
   const secondPersona = useRef("");
@@ -547,142 +538,9 @@ export default function Home() {
     }
   };
 
-  const checkModalClose = () => {
-    if (
-      character1GenderRef.current?.value &&
-      character2GenderRef.current?.value &&
-      languageRef.current?.value &&
-      is18PlusRef.current?.checked
-    ) {
-        setshowModal(false);
-        Cookies.set('character1Gender', character1GenderRef.current.value, { expires: 365 });
-        Cookies.set('character2Gender', character2GenderRef.current.value, { expires: 365 });
-        Cookies.set('language', languageRef.current.value, { expires: 365 });
-        Cookies.set('is18Plus', is18PlusRef.current.checked.toString(), { expires: 365 });
-        if (storyBackgroundRef.current) {
-          Cookies.set('storyBackground', storyBackgroundRef.current.value, { expires: 365 });
-        }
-    } else {
-      setshowModal(true);
-    }
-  };
-
-  useEffect(() => {
-    const character1Gender = Cookies.get('character1Gender');
-    const character2Gender = Cookies.get('character2Gender');
-    const language = Cookies.get('language');
-    const is18Plus = Cookies.get('is18Plus');
-    // console.log("character1Gender:");
-    // console.log(character1Gender);
-    // console.log("character2Gender:");
-    // console.log(character2Gender);
-    // console.log("language:");
-    // console.log(language);
-    // console.log("is18Plus:");
-    // console.log(is18Plus);
-
-    if (character1Gender && character1GenderRef.current) character1GenderRef.current.value = character1Gender;
-    if (character2Gender && character2GenderRef.current) character2GenderRef.current.value = character2Gender;
-    if (language && languageRef.current) languageRef.current.value = language;
-    if (is18Plus && is18PlusRef.current) is18PlusRef.current.checked = is18Plus === 'true';
-    if (storyBackgroundRef.current) {
-      const storyBackground = Cookies.get('storyBackground');
-      if (storyBackground) storyBackgroundRef.current.value = storyBackground;
-    }
-
-    checkModalClose();
-  }, []);
-
-  const toggleModal = () => {
-    if (!showModal) {
-      // Delay the setting of values to ensure refs are available
-      setTimeout(() => {
-        const character1Gender = Cookies.get('character1Gender');
-        const character2Gender = Cookies.get('character2Gender');
-        const language = Cookies.get('language');
-        const is18Plus = Cookies.get('is18Plus');
-        const storyBackground = Cookies.get('storyBackground');
-  
-        if (character1Gender && character1GenderRef.current) {
-          character1GenderRef.current.value = character1Gender;
-        }
-        if (character2Gender && character2GenderRef.current) {
-          character2GenderRef.current.value = character2Gender;
-        }
-        if (language && languageRef.current) {
-          languageRef.current.value = language;
-        }
-        if (is18Plus && is18PlusRef.current) {
-          is18PlusRef.current.checked = is18Plus === 'true';
-        }
-        if (storyBackground && storyBackgroundRef.current) {
-          storyBackgroundRef.current.value = storyBackground;
-        }
-      }, 0);
-    }
-    setshowModal(!showModal);
-  };
-
 return (
 <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 p-6">
-
-{showModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div className="bg-gray-800 text-white p-8 rounded-lg w-96 shadow-lg border border-purple-500">
-      <h2 className="text-2xl font-bold mb-4 text-purple-300">Settings</h2>
-      <div className="mb-4">
-        <label className="block mb-2 text-purple-200">Character 1 Biological Gender</label>
-        <select ref={character1GenderRef} className="w-full p-2 border rounded bg-gray-200 text-black border-purple-500">
-          <option value="" className="text-gray-500">Select</option>
-          <option value="♂">♂ Male</option>
-          <option value="♀">♀ Female</option>
-        </select>
-      </div>
-      <div className="mb-4">
-        <label className="block mb-2 text-purple-200">Character 2 Biological Gender</label>
-        <select ref={character2GenderRef} className="w-full p-2 border rounded bg-gray-200 text-black border-purple-500">
-          <option value="" className="text-gray-500">Select</option>
-          <option value="♂">♂ Male</option>
-          <option value="♀">♀ Female</option>
-        </select>
-      </div>
-      <div className="mb-4">
-        <label className="block mb-2 text-purple-200">Language</label>
-        <select ref={languageRef} className="w-full p-2 border rounded bg-gray-200 text-black border-purple-500">
-          <option value="" className="text-gray-500">Select</option>
-          <option value="en">English</option>
-          <option value="es">Spanish</option>
-          <option value="fr">French</option>
-        </select>
-      </div>
-      <div className="mb-4">
-        <label className="block mb-2 text-purple-200">Story Background (Optional)</label>
-        <textarea 
-          ref={storyBackgroundRef} 
-          className="w-full p-2 border rounded bg-gray-200 text-black border-purple-500 placeholder-gray-500" 
-          rows={3}
-          placeholder="Enter story background here..."
-        ></textarea>
-      </div>
-      <div className="mb-4">
-        <label className="flex items-center text-purple-200">
-          <input type="checkbox" ref={is18PlusRef} className="mr-2 bg-gray-200 border-purple-500" />
-          I am 18+ years old
-        </label>
-      </div>
-      <div className="mt-6 flex justify-end">
-              <button
-                onClick={checkModalClose}
-                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
-              >
-                Save
-              </button>
-            </div>
-    </div>
-  </div>
-)}
-
-<div className="max-w-6xl mx-auto bg-gray-900 bg-opacity-100 backdrop-blur-lg rounded-2xl shadow-2xl p-8">
+  <div className="max-w-6xl mx-auto bg-gray-900 bg-opacity-95 backdrop-blur-lg rounded-2xl shadow-2xl p-8">
     <label id="status-label"> </label>
     {/* Chat Display */}
     <div className="chat-container mb-8 bg-gray-800 rounded-lg p-4 shadow-inner border border-purple-500/20">
@@ -741,7 +599,7 @@ return (
       {/* Settings Button */}
       <div className="flex justify-center">
         <button
-          onClick={() => toggleModal()}
+          onClick={() => setIsPlaying(true)}
           className="w-32 h-10 mt-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white hover:from-blue-400 hover:to-blue-500 transition-all duration-300 shadow-lg border border-blue-400/30 hover:scale-110 active:scale-95"
         >
           <Settings className="w-8 h-8" />
@@ -750,6 +608,7 @@ return (
     </div>
   </div>
 </div>
+
 
   );
 };
