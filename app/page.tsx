@@ -166,10 +166,10 @@ export default function Home() {
       newMessage.classList.add("message");
       newMessage.textContent = typeof message.content === 'string' ? message.content : '';
       if (isRoleOne.current === 0) { 
-        // Female role
+        // Char 1 role
         newMessage.classList.add("text-green-400");
       } else if (isRoleOne.current === 1) { 
-        // Male role
+        // Char 2 role
         newMessage.classList.add("text-blue-400");
       } else if (isRoleOne.current === 2) { 
         // Narrator role
@@ -241,7 +241,7 @@ export default function Home() {
     // - **Expressions of Love:** Responds with tender gestures, savoring close moments with the woman.  
     // `; 
     const systemNarrator = `
-    Act as a narrator guiding the story's progression, focusing on deepening the relationship or body interaction between the female and male characters. Use a third-person narrative style to describe actions, emotions, and events, avoiding direct dialogue or conversation.
+    Act as a narrator guiding the story's progression, focusing on deepening the relationship or body interaction between the ${character1Gender} and ${character2Gender} characters. Use a third-person narrative style to describe actions, emotions, and events, avoiding direct dialogue or conversation.
     - Output Language:  ${language}. 
     `
 
@@ -363,8 +363,8 @@ export default function Home() {
             }
             updateLastMessage(curMessage);
             let finalMessage = await engine.getMessage();
-            const femalePrefix = "Female Character: ";
-            const malePrefix = "Male Character: ";
+            const femalePrefix = character1Gender + " Character: ";
+            const malePrefix = character2Gender + "Character: ";
             const narratorPrefix = "Narrator: ";
             if (isRoleOne.current === 0) { 
               if (!finalMessage.trim().startsWith(femalePrefix)) {
@@ -435,34 +435,53 @@ export default function Home() {
   `;
 
   const femalePrompt = `
-    Continoue the conversation in character as a **female** persona with the specified personality traits. Using her unique tone, expressions, and perspective. Gradually incorporate personal anecdotes, questions, or thoughts that deepen emotional intimacy. Keep the **conversation short**.
+    Continoue the conversation in character as a **${character1Gender}** persona with the specified personality traits. Using her unique tone, expressions, and perspective. Gradually incorporate personal anecdotes, questions, or thoughts that deepen emotional intimacy. Keep the **conversation short**.
   `;
   const malePrompt = `
-    Continoue the conversation in character as a **male** persona with the specified personality traits. Using his unique tone, expressions, and perspective. Gradually incorporate personal anecdotes, questions, or thoughts that deepen emotional intimacy. Keep the **conversation short**.
+    Continoue the conversation in character as a **${character2Gender}** persona with the specified personality traits. Using his unique tone, expressions, and perspective. Gradually incorporate personal anecdotes, questions, or thoughts that deepen emotional intimacy. Keep the **conversation short**.
   `;
 
   const boosterMale = `
-    Create a nature reaction using **${language}** for the next step to propose your relationship or body interaction to the next level as a **male**.
+    Create a nature reaction using **${language}** for the next step to propose your relationship or body interaction to the next level as your persona.
   `
   const boosterFemale = `
-    Create a nature reaction using **${language}** for the next step to propose your relationship or body interaction to the next level as a **female**.
+    Create a nature reaction using **${language}** for the next step to propose your relationship or body interaction to the next level as your persona.
   `;
-  const createFemaleCharacter = `
-    Create a concise, clear, and attractive persona profile for a female.
+  let createFemaleCharacter =`
+    Create a concise, clear, and attractive persona profile for a ${character1Gender}.
   `;
-  const createMaleCharacter = `
-    Create a concise, clear, and attractive persona profile for a male.
+  if (storyBackground !== "") {
+    createFemaleCharacter += `
+      **Background:** ${storyBackground}  
+    `;
+  }
+  let createMaleCharacter = `
+    Create a concise, clear, and attractive persona profile for a ${character2Gender}.
   `;
+  if (storyBackground !== "") {
+    createMaleCharacter += `
+      **Background:** ${storyBackground}  
+    `;
+  }
+
   const narrator = `
-    Describe a brief narrative outlining the next step in the interaction between a female character and a male character. Focus on deepening sexual interaction between the characters.
+    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender} character and a ${character2Gender} character. Focus on deepening sexual interaction between the characters.
   `;
   const narratorFemale = `
-    Describe a brief narrative outlining the next step in the interaction between a female character and a male character from a **female*'s view. Focus on deepening the relationship, body, or sexual interaction between the characters.
+    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender} character and a ${character2Gender} character from the *former character*'s view. Focus on deepening the relationship, body, or sexual interaction between the characters.
   `;
   const narratormale = `
-    Describe a brief narrative outlining the next step in the interaction between a female character and a male character from a *male*'s view. Focus on deepening the relationship, body, or sexual interaction between the characters.
+    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender} character and a ${character2Gender} character from the *latter character*'s view. Focus on deepening the relationship, body, or sexual interaction between the characters.
   `;
-
+  const narratorFemaleOrgasm = `
+    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender} character and a ${character2Gender} character from the *former character*'s view. Focus on enjoying the crazy orgasme with the partner.
+  `;
+  const narratormaleOrgasm = `
+    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender} character and a ${character2Gender} character from the *latter character*'s view.  Focus on enjoying the crazy orgasm with the partner.
+  `;
+  const narratorFinal = `
+    Describe the end of a satisfied sexual orgasm in the interaction between a ${character1Gender} character and a ${character2Gender} character
+  `;
 
   // const testPromptList = [scenario, malePrompt, 
   //   femalePrompt, malePrompt, 
@@ -493,14 +512,12 @@ export default function Home() {
       createFemaleCharacter, createMaleCharacter, scenario,
       narratorFemale, narratormale, narrator,
       narratorFemale, narratormale, narrator,
-      narratorFemale, narratormale, narrator,
-      narratorFemale, narratormale, narrator,
-      narratorFemale, narratormale, narrator,
-      narratorFemale, narratormale, narrator,
-      narratorFemale, narratormale, narrator,
-      narratorFemale, narratormale, narrator,
-      narratorFemale, narratormale, narrator,
-      narratorFemale, narratormale];
+      narratorFemaleOrgasm, narratormaleOrgasm, narrator,
+      narratorFemaleOrgasm, narratormaleOrgasm, narrator,
+      narratorFemaleOrgasm, narratormaleOrgasm, narrator,
+      narratorFemaleOrgasm, narratormaleOrgasm, narrator,
+      narratorFemaleOrgasm, narratormaleOrgasm, narrator,
+      narratorFinal];
   
 
   const runPause = async () => {
@@ -559,6 +576,8 @@ export default function Home() {
       Cookies.set('is18Plus', is18Plus.toString(), { expires: 365 });
       if (storyBackground) {
         Cookies.set('storyBackground', storyBackground, { expires: 365 });
+      } else {
+        Cookies.set('storyBackground', '', { expires: 365 });
       }
       setshowModal(false);
     } else {
@@ -627,8 +646,8 @@ return (
                 onChange={(e) => setCharacter1Gender(e.target.value)}
                 className="w-full p-2 border rounded bg-gray-200 text-black border-purple-500">
           <option value="" className="text-gray-500">Select</option>
-          <option value="♂">♂ Male</option>
-          <option value="♀">♀ Female</option>
+          <option value="Male">♂ Male</option>
+          <option value="Female">♀ Female</option>
         </select>
       </div>
       <div className="mb-4">
@@ -637,8 +656,8 @@ return (
                 onChange={(e) => setCharacter2Gender(e.target.value)}
                 className="w-full p-2 border rounded bg-gray-200 text-black border-purple-500">
           <option value="" className="text-gray-500">Select</option>
-          <option value="♂">♂ Male</option>
-          <option value="♀">♀ Female</option>
+          <option value="Male">♂ Male</option>
+          <option value="Female">♀ Female</option>
         </select>
       </div>
       <div className="mb-4">
