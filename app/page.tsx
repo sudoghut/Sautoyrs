@@ -715,43 +715,43 @@ return (
 )}
 
 <div className="max-w-6xl mx-auto bg-gray-900 bg-opacity-100 backdrop-blur-lg rounded-2xl shadow-2xl p-8">
-<h1 className="text-center text-4xl font-extrabold text-white  mb-4">
-    Sautoyrs
-</h1>
-    <label id="status-label"> </label>
-    {/* Chat Display */}
-    <div className="chat-container mb-8 bg-gray-800 rounded-lg p-4 shadow-inner border border-purple-500/20">
-      <div
-        id="chat-box"
-        className="h-[70vh] overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-gray-700 overflow-x-hidden scroll-smooth"
-      >
-      </div>
+  <h3 className="text-center text-4xl font-extrabold text-white  mb-4">
+      Sautoyrs
+  </h3>
+  <label id="status-label"> </label>
+  {/* Chat Display */}
+  <div className="chat-container mb-8 bg-gray-800 rounded-lg p-4 shadow-inner border border-purple-500/20">
+    <div
+      id="chat-box"
+      className="h-[70vh] overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-gray-700 overflow-x-hidden scroll-smooth"
+    >
     </div>
+  </div>
 
-    {/* Gaming Controller */}
-    <div className="flex flex-col items-center space-y-6">
-      {/* Play/Stop Controls */}
-      <div className="flex space-x-6">
-      <button
-        onClick={runPause}
-        id="play-button"
-        className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full flex items-center justify-center text-white transition-all duration-300 shadow-lg border ${
-          isPlaying
-            ? 'bg-gradient-to-br from-red-500 to-red-600 border-red-400/30 hover:from-red-400 hover:to-red-500'
-            : 'bg-gradient-to-br from-green-500 to-green-600 border-green-400/30 hover:from-green-400 hover:to-green-500'
-        } hover:scale-110 active:scale-95`}
-      >
-        {isPlaying ? <StopCircle /> : <PlayCircle />}
-      </button>
+  {/* Gaming Controller */}
+  <div className="flex flex-col items-center space-y-6">
+    {/* Play/Stop Controls */}
+    <div className="flex space-x-6">
+    <button
+      onClick={runPause}
+      id="play-button"
+      className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full flex items-center justify-center text-white transition-all duration-300 shadow-lg border ${
+        isPlaying
+          ? 'bg-gradient-to-br from-red-500 to-red-600 border-red-400/30 hover:from-red-400 hover:to-red-500'
+          : 'bg-gradient-to-br from-green-500 to-green-600 border-green-400/30 hover:from-green-400 hover:to-green-500'
+      } hover:scale-110 active:scale-95`}
+    >
+      {isPlaying ? <StopCircle /> : <PlayCircle />}
+    </button>
 
-      <button
-        onClick={() => toggleModal()}
-        className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white hover:from-blue-400 hover:to-blue-500 transition-all duration-300 shadow-lg border border-blue-400/30 hover:scale-110 active:scale-95"
-      >
-        <Settings className="w-6 h-6 sm:w-8 sm:h-8" />
-      </button>
-      </div>
+    <button
+      onClick={() => toggleModal()}
+      className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white hover:from-blue-400 hover:to-blue-500 transition-all duration-300 shadow-lg border border-blue-400/30 hover:scale-110 active:scale-95"
+    >
+      <Settings className="w-6 h-6 sm:w-8 sm:h-8" />
+    </button>
     </div>
+  </div>
   </div>
 </div>
   );
