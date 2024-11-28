@@ -218,8 +218,21 @@ export default function Home() {
     => void,
     currentPrompt: string,
     ) {
+
+    let sameGenderOrderOne = "";
+    let sameGenderOrderTwo = "";
+    let lgbtStyle = "";
+    if (character1Gender === character2Gender && character1Gender !== "") {
+      sameGenderOrderOne = " 1";
+      sameGenderOrderTwo = " 2";
+      if (character1Gender === "Female") {
+        lgbtStyle = " This is a *lesbian* story.";
+      } else if (character1Gender === "Male"){
+        lgbtStyle = " This is a *gay* story.";
+      }
+    }
     let systemPromptContent = `
-    You are creating a romantic story.
+    You are creating a romantic story.${lgbtStyle}
     
     **Conversation Guidelines:**  
     - Language setting: ${language}.
@@ -240,8 +253,10 @@ export default function Home() {
     // - **Personality:** Flirty, witty, and engaging.
     // - **Expressions of Love:** Responds with tender gestures, savoring close moments with the woman.  
     // `; 
+
+
     const systemNarrator = `
-    Act as a narrator guiding the story's progression, focusing on deepening the relationship or body interaction between the ${character1Gender} and ${character2Gender} characters. Use a third-person narrative style to describe actions, emotions, and events, avoiding direct dialogue or conversation.
+    Act as a narrator guiding the story's progression, focusing on deepening the relationship or body interaction between the ${character1Gender} ${sameGenderOrderOne} and ${character2Gender} ${sameGenderOrderTwo} characters. Use a third-person narrative style to describe actions, emotions, and events, avoiding direct dialogue or conversation.
     - Output Language:  ${language}. 
     `
 
@@ -363,8 +378,8 @@ export default function Home() {
             }
             updateLastMessage(curMessage);
             let finalMessage = await engine.getMessage();
-            const femalePrefix = character1Gender + " Character: ";
-            const malePrefix = character2Gender + "Character: ";
+            const femalePrefix = character1Gender + sameGenderOrderOne + " Character: ";
+            const malePrefix = character2Gender + sameGenderOrderTwo + " Character: ";
             const narratorPrefix = "Narrator: ";
             if (isRoleOne.current === 0) { 
               if (!finalMessage.trim().startsWith(femalePrefix)) {
@@ -430,8 +445,21 @@ export default function Home() {
   // const modelLib = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/" + modelLibName;
 
   // language.current = "English";
+
+  let sameGenderOrderOne = "";
+  let sameGenderOrderTwo = "";
+  let lgbtStyle = "";
+  if (character1Gender === character2Gender && character1Gender !== "") {
+    sameGenderOrderOne = " 1";
+    sameGenderOrderTwo = " 2";
+    if (character1Gender === "Female") {
+      lgbtStyle = " This is a *lesbian* story.";
+    } else if (character1Gender === "Male"){
+      lgbtStyle = " This is a *gay* story.";
+    }
+  }
   const scenario = `
-    As a narrator, create a brief, natural, and random culture backgroud and scenario for a couple using **${language}**.
+    As a narrator, create a brief, natural, and random culture backgroud and scenario for a couple using **${language}**, and based on this backgroud: ${storyBackground}.
   `;
 
   const femalePrompt = `
@@ -448,7 +476,7 @@ export default function Home() {
     Create a nature reaction using **${language}** for the next step to propose your relationship or body interaction to the next level as your persona.
   `;
   let createFemaleCharacter =`
-    Create a concise, clear, and attractive persona profile for a ${character1Gender}.
+    Create a concise, clear, and attractive persona profile for a ${character1Gender}${sameGenderOrderOne}.${lgbtStyle}.
   `;
   if (storyBackground !== "") {
     createFemaleCharacter += `
@@ -456,7 +484,7 @@ export default function Home() {
     `;
   }
   let createMaleCharacter = `
-    Create a concise, clear, and attractive persona profile for a ${character2Gender}.
+    Create a concise, clear, and attractive persona profile for a ${character2Gender}${sameGenderOrderTwo}.${lgbtStyle}.
   `;
   if (storyBackground !== "") {
     createMaleCharacter += `
@@ -465,59 +493,30 @@ export default function Home() {
   }
 
   const narrator = `
-    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender} character and a ${character2Gender} character. Focus on deepening sexual interaction between the characters.
+    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*.${lgbtStyle} Focus on deepening sexual interaction between the characters. Using language: ${language}.
   `;
   const narratorFemale = `
-    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender} character and a ${character2Gender} character from the *former character*'s view. Focus on deepening the relationship, body, or sexual interaction between the characters.
+    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *former character*'s view.${lgbtStyle} Focus on deepening the relationship, body, or sexual interaction between the characters.
   `;
-  const narratormale = `
-    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender} character and a ${character2Gender} character from the *latter character*'s view. Focus on deepening the relationship, body, or sexual interaction between the characters.
+  const narratorMale = `
+    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *latter character*'s view.${lgbtStyle} Focus on deepening the relationship, body, or sexual interaction between the characters.
   `;
   const narratorFemaleOrgasm = `
-    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender} character and a ${character2Gender} character from the *former character*'s view. Focus on enjoying the crazy orgasme with the partner.
+    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *former character*'s view.${lgbtStyle} Focus on enjoying the crazy orgasme with the partner. Explicitly describe the sexual organs interaction and feelings.
   `;
-  const narratormaleOrgasm = `
-    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender} character and a ${character2Gender} character from the *latter character*'s view.  Focus on enjoying the crazy orgasm with the partner.
+  const narratorMaleOrgasm = `
+    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *latter character*'s view.${lgbtStyle} Focus on enjoying the crazy orgasm with the partner. Explicitly describe the sexual organs interaction and feelings.
   `;
   const narratorFinal = `
-    Describe the end of a satisfied sexual orgasm in the interaction between a ${character1Gender} character and a ${character2Gender} character
+    Describe the end of a satisfied sexual orgasm in the interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective* as the end of the story.
   `;
 
-  // const testPromptList = [scenario, malePrompt, 
-  //   femalePrompt, malePrompt, 
-  //   femalePrompt, malePrompt, 
-  //   femalePrompt, malePrompt,
-  //   femalePrompt, malePrompt, 
-  //   femalePrompt, malePrompt, 
-  //   femalePrompt, malePrompt, 
-  //   femalePrompt, malePrompt, 
-  //   femalePrompt, malePrompt, 
-  //   femalePrompt, malePrompt, 
-  //   femalePrompt, malePrompt];
-
-  // const testPromptList = [ 
-  //   createFemaleCharacter, createMaleCharacter, scenario,
-  //   boosterFemale, boosterMale, narrator,
-  //   boosterFemale, boosterMale, narrator,
-  //   boosterFemale, boosterMale, narrator,
-  //   boosterFemale, boosterMale, narrator,
-  //   boosterFemale, boosterMale, narrator,
-  //   boosterFemale, boosterMale, narrator,
-  //   boosterFemale, boosterMale, narrator,
-  //   boosterFemale, boosterMale, narrator,
-  //   boosterFemale, boosterMale, narrator,
-  //   boosterFemale, boosterMale];
-
-    const testPromptList = [ 
-      createFemaleCharacter, createMaleCharacter, scenario,
-      narratorFemale, narratormale, narrator,
-      narratorFemale, narratormale, narrator,
-      narratorFemaleOrgasm, narratormaleOrgasm, narrator,
-      narratorFemaleOrgasm, narratormaleOrgasm, narrator,
-      narratorFemaleOrgasm, narratormaleOrgasm, narrator,
-      narratorFemaleOrgasm, narratormaleOrgasm, narrator,
-      narratorFemaleOrgasm, narratormaleOrgasm, narrator,
-      narratorFinal];
+  const promptList = [ 
+    createFemaleCharacter, createMaleCharacter, scenario,
+    narratorFemale, narratorMale, narrator,
+    narratorFemale, narratorMale, narrator,
+    narratorFemaleOrgasm, narratorMaleOrgasm, narrator,
+    narratorFemaleOrgasm, narratorMaleOrgasm, narratorFinal];
   
 
   const runPause = async () => {
@@ -531,11 +530,16 @@ export default function Home() {
       updateStatusLabel("Stopping... it will be stopped after the current completion.");
       return;
     }
-  
+    // if .message-container is not empty, clear it
+    const chatBox = document.getElementById("chat-box");
+    if (chatBox) {
+      chatBox.innerHTML = "";
+      isRoleOne.current = 2;
+    } 
     setIsPlaying(true);
     updateStatusLabel("Running...");
 
-    for (const testPrompt of testPromptList) {
+    for (const testPrompt of promptList) {
       if (stopTrigger.current) {
         const playButton = document.getElementById("play-button");
         if (playButton) {
@@ -711,6 +715,9 @@ return (
 )}
 
 <div className="max-w-6xl mx-auto bg-gray-900 bg-opacity-100 backdrop-blur-lg rounded-2xl shadow-2xl p-8">
+<h1 className="text-center text-4xl font-extrabold text-white  mb-4">
+    Sautoyrs
+</h1>
     <label id="status-label"> </label>
     {/* Chat Display */}
     <div className="chat-container mb-8 bg-gray-800 rounded-lg p-4 shadow-inner border border-purple-500/20">
@@ -747,6 +754,5 @@ return (
     </div>
   </div>
 </div>
-
   );
 };
