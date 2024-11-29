@@ -628,6 +628,7 @@ export default function Home() {
         await caches.delete(cacheName);
       });
       updateStatusLabel("Cache Storage cleared");
+      checkModalClose();
   };
 
   }
