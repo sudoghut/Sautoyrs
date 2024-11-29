@@ -15,7 +15,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Sautoyrs",
-  description: "Generate explicit sexual stories automatically with the power of a large language model.",
+  description: "Generate romantic and explicit sexual stories automatically with the power of a large language model.",
 };
 
 export default function RootLayout({

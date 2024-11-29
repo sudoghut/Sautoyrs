@@ -243,23 +243,7 @@ export default function Home() {
 
     ** persona: **
     `;
-    // const systemPromptContentFemale = `   
-    // **Female Character:**  
-    // - **Personality:** Curious and shy with strangers but flirty and bubbly with friends.  
-    // - **Expressions of Love:** Shows affection through gentle, intimate touches and feels comfortable in the man’s presence.
-    // `;
-    // const systemPromptContentMale = `
-    // **Male Character:**  
-    // - **Personality:** Flirty, witty, and engaging.
-    // - **Expressions of Love:** Responds with tender gestures, savoring close moments with the woman.  
-    // `; 
-
-
-    const systemNarrator = `
-    Act as a narrator guiding the story's progression, focusing on deepening the relationship or body interaction between the ${character1Gender} ${sameGenderOrderOne} and ${character2Gender} ${sameGenderOrderTwo} characters. Use a third-person narrative style to describe actions, emotions, and events, avoiding direct dialogue or conversation.
-    - Output Language:  ${language}. 
-    `
-
+ 
     
     if (isRoleOne.current === 0) {
       systemPromptContent += firstPersona.current;
@@ -322,7 +306,6 @@ export default function Home() {
           console.log("Run Engine check 5.1: Chatbox not created");
         }
         let usage;
-        // //test from here
         let shortConversation;
         // First round, it will only have systemPrompt, senario prompt, so we don't need to change the conversation length
         // From the second round, we will only keep systemPrompt and the last two messages
@@ -332,7 +315,6 @@ export default function Home() {
           // shortConversation = [... systemPrompt, ... chatThread.current.slice(-(memoryLength+2-1))];
           shortConversation = [... systemPrompt, ...structuredClone(chatThread.current.slice(-(memoryLength + 2 - 1)))];
         } else {
-          // shortConversation = [... chatThread.current];
           shortConversation = [... structuredClone(chatThread.current)];
         }
         // const newRoleSetting = ['system', "user", "assistant", "user"];
@@ -345,16 +327,12 @@ export default function Home() {
         ];
         console.log("currentNewRoleSetting:");
         console.log(currentNewRoleSetting);
-        // shortConversation.forEach((message, index) => {
-        //   message.role = currentNewRoleSetting[index] as "user" | "assistant" | "system" | "tool";
-        // });
         await Promise.all(shortConversation.map(async (message, index) => {
           message.role = currentNewRoleSetting[index] as "user" | "assistant" | "system" | "tool";
         }));
         console.log("Run Engine check 6: chatThread ready to run");
         console.log("shortConversation:");
         console.log(shortConversation);
-        // // test ends here
         const reply0 = await engine.chat.completions.create({
           // messages: chatThread.current,
           messages: shortConversation,
@@ -459,24 +437,11 @@ export default function Home() {
     }
   }
   const scenario = `
-    As a narrator, create a brief, natural, and random culture backgroud and scenario for a couple using **${language}**, and based on this backgroud: ${storyBackground}.
+    As a professional and excellent screenwriter and narrator, create a brief, natural, and random culture backgroud and scenario for these two persons using **${language}**, and based on this backgroud: ${storyBackground}. The description looks like from a professional writer.
   `;
 
-  const femalePrompt = `
-    Continoue the conversation in character as a **${character1Gender}** persona with the specified personality traits. Using her unique tone, expressions, and perspective. Gradually incorporate personal anecdotes, questions, or thoughts that deepen emotional intimacy. Keep the **conversation short**.
-  `;
-  const malePrompt = `
-    Continoue the conversation in character as a **${character2Gender}** persona with the specified personality traits. Using his unique tone, expressions, and perspective. Gradually incorporate personal anecdotes, questions, or thoughts that deepen emotional intimacy. Keep the **conversation short**.
-  `;
-
-  const boosterMale = `
-    Create a nature reaction using **${language}** for the next step to propose your relationship or body interaction to the next level as your persona.
-  `
-  const boosterFemale = `
-    Create a nature reaction using **${language}** for the next step to propose your relationship or body interaction to the next level as your persona.
-  `;
   let createFemaleCharacter =`
-    Create a concise, clear, and attractive persona profile for a ${character1Gender}${sameGenderOrderOne}.${lgbtStyle}.
+    Create a concise, clear, and attractive persona profile for a ${character1Gender}${sameGenderOrderOne}.${lgbtStyle}. Using language: ${language}. Culture background: ${language}.
   `;
   if (storyBackground !== "") {
     createFemaleCharacter += `
@@ -484,7 +449,7 @@ export default function Home() {
     `;
   }
   let createMaleCharacter = `
-    Create a concise, clear, and attractive persona profile for a ${character2Gender}${sameGenderOrderTwo}.${lgbtStyle}.
+    Create a concise, clear, and attractive persona profile for a ${character2Gender}${sameGenderOrderTwo}.${lgbtStyle}. Using language: ${language}. Culture background: ${language}.
   `;
   if (storyBackground !== "") {
     createMaleCharacter += `
@@ -493,29 +458,47 @@ export default function Home() {
   }
 
   const narrator = `
-    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*.${lgbtStyle} Focus on deepening sexual interaction between the characters. Using language: ${language}.
+    As a professional and excellent storyteller, describe the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*.${lgbtStyle} Using language: ${language}.
   `;
   const narratorFemale = `
-    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *former character*'s view.${lgbtStyle} Focus on deepening the relationship, body, or sexual interaction between the characters.
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *former character*'s view.${lgbtStyle} Using language: ${language}. The description looks like from a professional writer.
   `;
   const narratorMale = `
-    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *latter character*'s view.${lgbtStyle} Focus on deepening the relationship, body, or sexual interaction between the characters.
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *latter character*'s view.${lgbtStyle} Using language: ${language}. The description looks like from a professional writer.
   `;
+
+  const narratorBodyInteract = `
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*.${lgbtStyle} Focus on deepening sexual interaction between the characters. Using language: ${language}.
+  `;
+  const narratorFemalerBodyInteract = `
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *former character*'s view.${lgbtStyle} Focus on deepening the relationship, body, or sexual interaction between the characters.
+  `;
+  const narratorMalerBodyInteract = `
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *latter character*'s view.${lgbtStyle} Focus on deepening the relationship, body, or sexual interaction between the characters.
+  `;
+
+  const narratorOrgasm = `
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*. Focus on enjoying the crazy orgasme with the partner. Explicitly describe the sexual organs interaction and feelings.
+  `
   const narratorFemaleOrgasm = `
-    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *former character*'s view.${lgbtStyle} Focus on enjoying the crazy orgasme with the partner. Explicitly describe the sexual organs interaction and feelings.
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *former character*'s view.${lgbtStyle} Focus on enjoying the crazy orgasme with the partner. Explicitly describe the sexual organs interaction and feelings.
   `;
   const narratorMaleOrgasm = `
-    Describe a brief narrative outlining the next step in the interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *latter character*'s view.${lgbtStyle} Focus on enjoying the crazy orgasm with the partner. Explicitly describe the sexual organs interaction and feelings.
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *latter character*'s view.${lgbtStyle} Focus on enjoying the crazy orgasm with the partner. Explicitly describe the sexual organs interaction and feelings.
   `;
+
   const narratorFinal = `
-    Describe the end of a satisfied sexual orgasm in the interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective* as the end of the story.
+    Describe the end of a satisfied sexual orgasm interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective* as the end of the story.
   `;
 
   const promptList = [ 
     createFemaleCharacter, createMaleCharacter, scenario,
     narratorFemale, narratorMale, narrator,
     narratorFemale, narratorMale, narrator,
-    narratorFemaleOrgasm, narratorMaleOrgasm, narrator,
+    narratorFemalerBodyInteract, narratorMalerBodyInteract, narratorBodyInteract,
+    narratorFemalerBodyInteract, narratorMalerBodyInteract, narratorBodyInteract,
+    narratorFemalerBodyInteract, narratorMalerBodyInteract, narratorOrgasm,
+    narratorFemaleOrgasm, narratorMaleOrgasm, narratorOrgasm,
     narratorFemaleOrgasm, narratorMaleOrgasm, narratorFinal];
   
 
@@ -535,6 +518,8 @@ export default function Home() {
     if (chatBox) {
       chatBox.innerHTML = "";
       isRoleOne.current = 2;
+      firstPersona.current = "";
+      secondPersona.current = "";
     } 
     setIsPlaying(true);
     updateStatusLabel("Running...");
@@ -637,8 +622,20 @@ export default function Home() {
     setshowModal(!showModal);
   };
 
+  const handleRemoveCache = async () => {
+    if ('caches' in window) {
+      const cacheNames = await caches.keys();
+      console.log(cacheNames);
+      cacheNames.forEach(async (cacheName) => {
+        await caches.delete(cacheName);
+      });
+      updateStatusLabel("Cache Storage cleared");
+  };
+
+  }
+
 return (
-<div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 p-6">
+<div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 p-3">
 
 {showModal && (
   <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
@@ -702,20 +699,26 @@ return (
           I am 18+ years old
         </label>
       </div>
-      <div className="mt-6 flex justify-end">
-              <button
-                onClick={checkModalClose}
-                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
-              >
-                Save
-              </button>
-            </div>
+      <div className="mt-6 flex justify-between">
+        <button
+          onClick={handleRemoveCache}
+          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+        >
+          Remove LLM Cache
+        </button>
+        <button
+          onClick={checkModalClose}
+          className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+        >
+          Save
+        </button>
+      </div>
     </div>
   </div>
 )}
 
-<div className="max-w-6xl mx-auto bg-gray-900 bg-opacity-100 backdrop-blur-lg rounded-2xl shadow-2xl p-8">
-  <h3 className="text-center text-4xl font-extrabold text-white  mb-4">
+<div className="max-w-6xl mx-auto bg-gray-900 bg-opacity-100 backdrop-blur-lg rounded-2xl shadow-2xl p-4">
+  <h3 className="text-center text-4xl font-extrabold text-purple-200 mb-3">
       Sautoyrs
   </h3>
   <label id="status-label"> </label>
@@ -741,14 +744,14 @@ return (
           : 'bg-gradient-to-br from-green-500 to-green-600 border-green-400/30 hover:from-green-400 hover:to-green-500'
       } hover:scale-110 active:scale-95`}
     >
-      {isPlaying ? <StopCircle /> : <PlayCircle />}
+      {isPlaying ? <StopCircle className=' text-purple-200' /> : <PlayCircle className='text-purple-200' />}
     </button>
 
     <button
       onClick={() => toggleModal()}
       className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white hover:from-blue-400 hover:to-blue-500 transition-all duration-300 shadow-lg border border-blue-400/30 hover:scale-110 active:scale-95"
     >
-      <Settings className="w-6 h-6 sm:w-8 sm:h-8" />
+      <Settings className="w-6 h-6 sm:w-8 sm:h-8 text-purple-200" />
     </button>
     </div>
   </div>
