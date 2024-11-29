@@ -232,6 +232,12 @@ export default function Home() {
         lgbtStyle = " This is a *gay* story.";
       }
     }
+    let storyBackgroundSufix = "";
+    if (storyBackground !== "" ){
+      storyBackgroundSufix = " Story Background: " + storyBackground;
+    }
+
+
     let systemPromptContent = `
     You are creating a romantic story.${lgbtStyle}
     
@@ -241,6 +247,8 @@ export default function Home() {
     - Maintain an engaging tone that aligns with the character's profile.  
     - Don't translate.
     - Generate the story directly without any explanation or additional commentary about personality traits, generation approach, or reasoning.
+
+    ${storyBackgroundSufix}
 
     ** persona: **
     `;
@@ -401,7 +409,6 @@ export default function Home() {
         // stop the program
         return;
       }
-      // 记得一轮运行完成之后 isRunning.current = false;
     isRunning.current = false;
   } else
     {
@@ -479,7 +486,7 @@ export default function Home() {
   `;
 
   const narratorOrgasm = `
-    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*. Focus on enjoying the crazy orgasme with the partner. Explicitly describe the sexual organs interaction and feelings.
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*. Focus on enjoying the crazy orgasme with the partner. Explicitly describe the sexual organs interaction and feelings. Using language: ${language}.
   `
   const narratorFemaleOrgasm = `
     Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *former character*'s view.${lgbtStyle} Focus on enjoying the crazy orgasme with the partner. Explicitly describe the sexual organs interaction and feelings.
