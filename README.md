@@ -17,14 +17,16 @@ Sautoyrs is a web application that generates romantic and explicit sexual storie
 
 ## Usage
 
-1. Configure your story parameters:  
-   - Set character genders  
-   - Choose a language  
-   - Confirm your age (18+)  
+![sautoyrs](https://github.com/user-attachments/assets/981613d3-aedb-4abb-b32f-34e429d94ee6)
 
-2. Click the play button to start generating the story.  
-3. Use the stop button to pause the generation at any time.  
-4. After stopping, clicking the play button will start a new story.
+1. Set the first character's gender.  
+2. Set the second character's gender.  
+3. Select the language.  
+4. Confirm your age.  
+5. Save your settings.  
+6. Click the play button to start generating the story.  
+7. Use the stop button to pause the generation at any time.  
+8. After stopping, click the play button to start a new story.  
 
 ## Features
 
