@@ -113,7 +113,7 @@ export default function Home() {
       const container = document.createElement("div");
       container.classList.add("message-container");
   
-      let currentMessageType: 'user' | 'assistant' | null = 
+      const currentMessageType: 'user' | 'assistant' | null = 
         lastMessageType === 'user' || lastMessageType === 'assistant'
         ? lastMessageType
         : null;
