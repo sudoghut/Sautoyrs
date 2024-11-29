@@ -4,7 +4,7 @@
 
 ## Notes
 
-- The application supports only browsers that are compatible with WebGPU. Most **mobile browsers (both iPhone and Android) do not support WebGPU**. We highly recommend using **Chrome or Firefox on a desktop or laptop to access Sautoyrs. (Recommended memory for Windows: 32GB)**
+- The application supports only browsers that are compatible with WebGPU. Most **mobile browsers (both iPhone and Android) do NOT support WebGPU**. We highly recommend using **Chrome or Firefox on a desktop or laptop to access Sautoyrs. (Recommended memory for Windows: 32GB)**
 - Sautoyrs downloads the Gemma-2-Ataraxy-9B model (~5.2 GB) to your browser cache. To remove the cache, click the settings icon and select "Remove LLM Cache."  
 - For reference, here are generation speed cases on Nvidia GTX 3070:  
   > Prefill: 14.7263 tokens/sec, Decoding: 1.3206 tokens/sec  
