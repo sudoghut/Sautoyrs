@@ -1,6 +1,6 @@
 # Sautoyrs
 
-Sautoyrs is a web application that generates romantic and explicit sexual stories automatically using a large language model. It creates interactive narratives between two characters with customizable settings.
+[Sautoyrs](https://sautoyrs.oopus.info) is a web application that generates romantic and explicit sexual stories automatically using a large language model. It creates interactive narratives between two characters with customizable settings.
 
 ## Notes
 
@@ -16,6 +16,8 @@ Sautoyrs is a web application that generates romantic and explicit sexual storie
 - This application contains mature content and is intended for adult audiences only. Please use it responsibly and in compliance with all applicable laws and regulations.  
 
 ## Usage
+
+Visit https://sautoyrs.oopus.info
 
 ![sautoyrs](https://github.com/user-attachments/assets/981613d3-aedb-4abb-b32f-34e429d94ee6)
 
