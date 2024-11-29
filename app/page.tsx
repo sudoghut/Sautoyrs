@@ -385,7 +385,7 @@ export default function Home() {
             // console.log("Run Engine check before 8: ChatThread display");
             // console.log(chatThread.current);
           } catch (e) {
-            // console.log(e);
+            console.log(e);
           }
         }
         console.log("Run Engine check 8: End");
