@@ -308,7 +308,7 @@ export default function Home() {
         }
         let usage;
         let shortConversation;
-        // First round, it will only have systemPrompt, senario prompt, so we don't need to change the conversation length
+        // First round, it will only have systemPrompt, scenario prompt, so we don't need to change the conversation length
         // From the second round, we will only keep systemPrompt and the last two messages
         const memoryLength = 2;
         // plus 2 is for the systemPrompt and the current instruct prompt
