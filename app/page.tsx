@@ -720,7 +720,7 @@ return (
   </h3>
   <label id="status-label" className="text-purple-200"> </label>
   {/* Chat Display */}
-  <div className="chat-container mb-8 bg-gray-800 rounded-lg p-4 shadow-inner border border-purple-500/20">
+  <div className="chat-container mb-8 bg-gray-800 rounded-lg p-4 shadow-inner border border-purple-500/20 mt-1">
     <div
       id="chat-box"
       className="h-[70vh] overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-gray-700 overflow-x-hidden scroll-smooth"
