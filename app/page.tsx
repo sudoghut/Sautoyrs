@@ -9,6 +9,7 @@ import {
 import * as webllm from "@mlc-ai/web-llm";
 import { ChatCompletionMessageParam } from '@mlc-ai/web-llm';
 import Cookies from 'js-cookie';
+import { Analytics } from "@vercel/analytics/react"
 
 function setLabel(id: string, text: string) {
   const label = document.getElementById(id);
@@ -633,6 +634,7 @@ export default function Home() {
 
 return (
 <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 p-3">
+<Analytics />
 
 {showModal && (
   <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
