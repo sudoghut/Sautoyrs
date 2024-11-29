@@ -495,8 +495,7 @@ export default function Home() {
     createFemaleCharacter, createMaleCharacter, scenario,
     narratorFemale, narratorMale, narrator,
     narratorFemalerBodyInteract, narratorMalerBodyInteract, narratorBodyInteract,
-    narratorFemalerBodyInteract, narratorMalerBodyInteract, narratorOrgasm,
-    narratorFemaleOrgasm, narratorMaleOrgasm, narratorOrgasm,
+    narratorFemalerBodyInteract, narratorMaleOrgasm, narratorOrgasm,
     narratorFemaleOrgasm, narratorMaleOrgasm, narratorFinal];
   
 
@@ -719,7 +718,7 @@ return (
   <h3 className="text-center text-4xl font-extrabold text-purple-200 mb-3">
       Sautoyrs
   </h3>
-  <label id="status-label"> </label>
+  <label id="status-label" className="text-purple-200"> </label>
   {/* Chat Display */}
   <div className="chat-container mb-8 bg-gray-800 rounded-lg p-4 shadow-inner border border-purple-500/20">
     <div
