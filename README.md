@@ -4,15 +4,12 @@ Sautoyrs is a web application that generates romantic and explicit sexual storie
 
 ## Notes
 
-- It only supports browsers that are compatible with WebGPU. Most cellphone browsers do not support WebGPU. We highly recommend using Chrome or Firefox to access Sautoyrs on your desktop or laptop.
-
-- Sautoyrs will download the Gemma-2-Ataraxy-9B model, which is ~5.2GB, to your browser cache. To remove the cache, click the settings icon and then select "Remove Cache."
-
-- For reference, here is the generation speed on my GTR 3070:
-
-> Prefill: 38.6973 tokens/sec, Decoding: 2.2036 tokens/sec
-
-- This application contains mature content and is intended for adult audiences only. Please use responsibly and in accordance with all applicable laws and regulations.
+- The application supports only browsers compatible with WebGPU. Most mobile browsers do not support WebGPU. We highly recommend using Chrome or Firefox on a desktop or laptop to access Sautoyrs.  
+- Sautoyrs downloads the Gemma-2-Ataraxy-9B model (~5.2 GB) to your browser cache. To remove the cache, click the settings icon and select "Remove LLM Cache."  
+- For reference, here are generation speed cases on my GTX 3070:  
+  > Prefill: 14.7263 tokens/sec, Decoding: 1.3206 tokens/sec  
+  > Prefill: 38.6973 tokens/sec, Decoding: 2.2036 tokens/sec  
+- This application contains mature content and is intended for adult audiences only. Please use it responsibly and in compliance with all applicable laws and regulations.  
 
 ## Usage
 

@@ -494,8 +494,6 @@ export default function Home() {
   const promptList = [ 
     createFemaleCharacter, createMaleCharacter, scenario,
     narratorFemale, narratorMale, narrator,
-    narratorFemale, narratorMale, narrator,
-    narratorFemalerBodyInteract, narratorMalerBodyInteract, narratorBodyInteract,
     narratorFemalerBodyInteract, narratorMalerBodyInteract, narratorBodyInteract,
     narratorFemalerBodyInteract, narratorMalerBodyInteract, narratorOrgasm,
     narratorFemaleOrgasm, narratorMaleOrgasm, narratorOrgasm,
@@ -756,6 +754,9 @@ return (
     </div>
   </div>
   </div>
+  <footer className="mt-3 text-center text-purple-200 text-sm">
+    By oopus
+  </footer>
 </div>
   );
 };
