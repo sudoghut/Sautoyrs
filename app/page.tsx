@@ -469,30 +469,30 @@ export default function Home() {
     As a professional and excellent storyteller, describe the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*.${lgbtStyle} Using language: ${language}.
   `;
   const narratorFemale = `
-    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *former character*'s view.${lgbtStyle} Using language: ${language}. The description looks like from a professional writer.
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderOne}.${lgbtStyle} Using language: ${language}. The description looks like from a professional writer.
   `;
   const narratorMale = `
-    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *latter character*'s view.${lgbtStyle} Using language: ${language}. The description looks like from a professional writer.
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderTwo}'s view.${lgbtStyle} Using language: ${language}. The description looks like from a professional writer.
   `;
 
   const narratorBodyInteract = `
     Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*.${lgbtStyle} Focus on deepening sexual interaction between the characters. Using language: ${language}.
   `;
-  const narratorFemalerBodyInteract = `
-    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *former character*'s view.${lgbtStyle} Focus on deepening the relationship, body, or sexual interaction between the characters.
+  const narratorFemaleBodyInteract = `
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderOne}'s view.${lgbtStyle} Focus on deepening the relationship, body, or sexual interaction between the characters.
   `;
-  const narratorMalerBodyInteract = `
-    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *latter character*'s view.${lgbtStyle} Focus on deepening the relationship, body, or sexual interaction between the characters.
+  const narratorMaleBodyInteract = `
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderTwo}'s view.${lgbtStyle} Focus on deepening the relationship, body, or sexual interaction between the characters.
   `;
 
   const narratorOrgasm = `
-    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*. Focus on enjoying the crazy orgasme with the partner. Explicitly describe the sexual organs interaction and feelings. Using language: ${language}.
+    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*. Focus on enjoying the crazy orgasme with the partner. Explicitly describe the sexual organs interaction and feelings. Using language: ${language}.
   `
   const narratorFemaleOrgasm = `
-    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *former character*'s view.${lgbtStyle} Focus on enjoying the crazy orgasme with the partner. Explicitly describe the sexual organs interaction and feelings.
+    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderOne}'s view.${lgbtStyle} Focus on enjoying the crazy orgasme with the partner. Explicitly describe the sexual organs interaction and feelings.
   `;
   const narratorMaleOrgasm = `
-    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from the *latter character*'s view.${lgbtStyle} Focus on enjoying the crazy orgasm with the partner. Explicitly describe the sexual organs interaction and feelings.
+    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderTwo}'s view.${lgbtStyle} Focus on enjoying the crazy orgasm with the partner. Explicitly describe the sexual organs interaction and feelings.
   `;
 
   const narratorFinal = `
@@ -502,8 +502,8 @@ export default function Home() {
   const promptList = [ 
     createFemaleCharacter, createMaleCharacter, scenario,
     narratorFemale, narratorMale, narrator,
-    narratorFemalerBodyInteract, narratorMalerBodyInteract, narratorBodyInteract,
-    narratorFemalerBodyInteract, narratorMaleOrgasm, narratorOrgasm,
+    narratorFemaleBodyInteract, narratorMaleBodyInteract, narratorBodyInteract,
+    narratorFemaleBodyInteract, narratorMaleOrgasm, narratorOrgasm,
     narratorFemaleOrgasm, narratorMaleOrgasm, narratorFinal];
   
 
