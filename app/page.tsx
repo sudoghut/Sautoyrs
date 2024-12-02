@@ -485,9 +485,16 @@ export default function Home() {
     Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderTwo}'s view.${lgbtStyle} Focus on deepening the relationship, body, or sexual interaction between the characters.
   `;
 
-  const narratorOrgasm = `
-    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*. Focus on enjoying the crazy orgasme with the partner. Explicitly describe the sexual organs interaction and feelings. Using language: ${language}.
+  const narratorBeforeOrgasm = `
+    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*. Focus on enjoying the crazy sex with the partner before orgasm. Explicitly describe the sexual organs interaction and feelings. Using language: ${language}.
   `
+  const narratorFemaleBeforeOrgasm = `
+    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderOne}'s view.${lgbtStyle} Focus on enjoying the crazy sex with the partner before orgasm. Explicitly describe the sexual interaction and feelings.
+  `;
+  const narratorMaleBeforeOrgasm = `
+    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderTwo}'s view.${lgbtStyle} Focus on enjoying the crazy sex with the partner before orgasm. Explicitly describe the sexual interaction and feelings.
+  `;
+
   const narratorFemaleOrgasm = `
     Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderOne}'s view.${lgbtStyle} Focus on enjoying the crazy orgasme with the partner. Explicitly describe the sexual organs interaction and feelings.
   `;
@@ -503,7 +510,7 @@ export default function Home() {
     createFemaleCharacter, createMaleCharacter, scenario,
     narratorFemale, narratorMale, narrator,
     narratorFemaleBodyInteract, narratorMaleBodyInteract, narratorBodyInteract,
-    narratorFemaleBodyInteract, narratorMaleOrgasm, narratorOrgasm,
+    narratorFemaleBeforeOrgasm, narratorMaleBeforeOrgasm, narratorBeforeOrgasm,
     narratorFemaleOrgasm, narratorMaleOrgasm, narratorFinal];
   
 
