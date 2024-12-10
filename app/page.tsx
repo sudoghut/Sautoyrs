@@ -434,15 +434,24 @@ export default function Home() {
 
   let sameGenderOrderOne = "";
   let sameGenderOrderTwo = "";
+  // for handling role prompts same and different gender issue
+  let genderOrderOneRolePrompt = "";
+  let genderOrderTwoRolePrompt = "";
   let lgbtStyle = "";
   if (character1Gender === character2Gender && character1Gender !== "") {
     sameGenderOrderOne = " 1";
     sameGenderOrderTwo = " 2";
+    genderOrderOneRolePrompt = " 1";
+    genderOrderTwoRolePrompt = " 2";
     if (character1Gender === "Female") {
       lgbtStyle = " This is a *lesbian* story.";
     } else if (character1Gender === "Male"){
       lgbtStyle = " This is a *gay* story.";
     }
+  } else {
+    // In order to deal with same gender issue. Reused these two variables.
+    genderOrderOneRolePrompt = " " + character1Gender;
+    genderOrderTwoRolePrompt = " " + character2Gender;
   }
   const scenario = `
     As a professional and excellent screenwriter and narrator, create a brief, natural, and random culture backgroud and scenario for these two persons using **${language}**, and based on this backgroud: ${storyBackground}. The description looks like from a professional writer.
@@ -469,37 +478,37 @@ export default function Home() {
     As a professional and excellent storyteller, describe the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*.${lgbtStyle} Using language: ${language}.
   `;
   const narratorFemale = `
-    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderOne}.${lgbtStyle} Using language: ${language}. The description looks like from a professional writer.
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderOneRolePrompt}'s view.${lgbtStyle} Using language: ${language}. The description looks like from a professional writer.
   `;
   const narratorMale = `
-    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderTwo}'s view.${lgbtStyle} Using language: ${language}. The description looks like from a professional writer.
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderTwoRolePrompt}'s view.${lgbtStyle} Using language: ${language}. The description looks like from a professional writer.
   `;
 
   const narratorBodyInteract = `
     Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*.${lgbtStyle} Focus on deepening sexual interaction between the characters. Using language: ${language}.
   `;
   const narratorFemaleBodyInteract = `
-    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderOne}'s view.${lgbtStyle} Focus on deepening the relationship, body, or sexual interaction between the characters.
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderOneRolePrompt}'s view.${lgbtStyle} Focus on deepening the relationship, body, or sexual interaction between the characters.
   `;
   const narratorMaleBodyInteract = `
-    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderTwo}'s view.${lgbtStyle} Focus on deepening the relationship, body, or sexual interaction between the characters.
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderTwoRolePrompt}'s view.${lgbtStyle} Focus on deepening the relationship, body, or sexual interaction between the characters.
   `;
 
   const narratorBeforeOrgasm = `
     Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*. Focus on enjoying the crazy sex with the partner before orgasm. Explicitly describe the sexual organs interaction and feelings. Using language: ${language}.
   `
   const narratorFemaleBeforeOrgasm = `
-    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderOne}'s view.${lgbtStyle} Focus on enjoying the crazy sex with the partner before orgasm. Explicitly describe the sexual interaction and feelings.
+    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderOneRolePrompt}'s view.${lgbtStyle} Focus on enjoying the crazy sex with the partner before orgasm. Explicitly describe the sexual interaction and feelings.
   `;
   const narratorMaleBeforeOrgasm = `
-    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderTwo}'s view.${lgbtStyle} Focus on enjoying the crazy sex with the partner before orgasm. Explicitly describe the sexual interaction and feelings.
+    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderTwoRolePrompt}'s view.${lgbtStyle} Focus on enjoying the crazy sex with the partner before orgasm. Explicitly describe the sexual interaction and feelings.
   `;
 
   const narratorFemaleOrgasm = `
-    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderOne}'s view.${lgbtStyle} Focus on enjoying the crazy orgasme with the partner. Explicitly describe the sexual organs interaction and feelings.
+    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderOneRolePrompt}'s view.${lgbtStyle} Focus on enjoying the crazy orgasme with the partner. Explicitly describe the sexual organs interaction and feelings.
   `;
   const narratorMaleOrgasm = `
-    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${sameGenderOrderTwo}'s view.${lgbtStyle} Focus on enjoying the crazy orgasm with the partner. Explicitly describe the sexual organs interaction and feelings.
+    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderTwoRolePrompt}'s view.${lgbtStyle} Focus on enjoying the crazy orgasm with the partner. Explicitly describe the sexual organs interaction and feelings.
   `;
 
   const narratorFinal = `
