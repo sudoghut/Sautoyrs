@@ -254,4 +254,15 @@ Maintaining a respectful and considerate attitude, ensuring your partner's comfo
     - **Personality:** Flirty, witty, and engaging.
     - **Expressions of Love:** Responds with tender gestures, savoring close moments with the woman.  
     `; 
+
+  const narratorFemaleOrgasm = `
+    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderOneRolePrompt}'s view.${lgbtStyle} Focus on enjoying the crazy orgasme with the partner. Explicitly describe the sexual organs interaction and feelings.
+  `;
+  const narratorMaleOrgasm = `
+    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderTwoRolePrompt}'s view.${lgbtStyle} Focus on enjoying the crazy orgasm with the partner. Explicitly describe the sexual organs interaction and feelings.
+  `;
+
+  const narratorFinal = `
+    Describe the end of a satisfied sexual orgasm interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective* as the end of the story.
+  `;
 ```
