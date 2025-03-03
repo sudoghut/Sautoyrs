@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.2.0",
     "@mlc-ai/web-llm": "^0.2.73",
     "@vercel/analytics": "^1.4.1",
     "js-cookie": "^3.0.5",
