@@ -91,6 +91,7 @@ export default function Home() {
     const result = await chatSession.sendMessage(jailbreak + currentPrompt);
     console.log("API Engine check 4: chatSession message sent");
     console.log("result:",result);
+    await new Promise(r => setTimeout(r, 5000));
     return result.response.text();
   };
 
@@ -453,7 +454,7 @@ export default function Home() {
 
             updateLastMessage(curMessage);
             let finalMessage
-            if (engine) {
+            if (ApiToken === "" && engine) {
               finalMessage = await engine.getMessage();
             } else {
               finalMessage = curMessage;
