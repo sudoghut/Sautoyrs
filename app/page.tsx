@@ -50,8 +50,6 @@ export default function Home() {
   const apiEngine = async (conversation: ChatCompletionMessageParam[], llmToken: string) => {
     const {
       GoogleGenerativeAI,
-      HarmCategory,
-      HarmBlockThreshold,
     } = require("@google/generative-ai");
 
     const genAI = new GoogleGenerativeAI(llmToken);
