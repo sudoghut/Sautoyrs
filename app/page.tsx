@@ -85,7 +85,7 @@ export default function Home() {
     const result = await chatSession.sendMessage(jailbreak + currentPrompt);
     console.log("API Engine check 4: chatSession message sent");
     console.log("result:",result);
-    await new Promise(r => setTimeout(r, 10000));
+    await new Promise(r => setTimeout(r, 20000));
     return result.response.text();
   };
 
