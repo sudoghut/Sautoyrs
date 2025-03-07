@@ -562,35 +562,39 @@ export default function Home() {
     `;
   }
 
-  const narrator = `
-    As a professional and excellent storyteller, describe the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*.${lgbtStyle} Using language: ${language}.
-  `;
+  // const narrator = `
+  //   As a professional and excellent storyteller, describe the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*.${lgbtStyle} Using language: ${language}.
+  // `;
   const narratorFemale = `
-    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderOneRolePrompt}'s view.${lgbtStyle} Using language: ${language}. The description looks like from a professional writer. Now character${genderOrderOneRolePrompt} says:
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderOneRolePrompt}'s view.${lgbtStyle} Using language: ${language}. The description looks like from a professional writer. This is the stage before sex. Now character${genderOrderOneRolePrompt} says:
   `;
   const narratorMale = `
-    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderTwoRolePrompt}'s view.${lgbtStyle} Using language: ${language}. The description looks like from a professional writer. Now character${genderOrderTwoRolePrompt} says:
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderTwoRolePrompt}'s view.${lgbtStyle} Using language: ${language}. The description looks like from a professional writer. This is the stage before sex. Now character${genderOrderTwoRolePrompt} says:
   `;
 
   const narratorBodyInteract = `
-    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*.${lgbtStyle} Focus on setting the mood, deepening sexual interaction between the characters. Using language: ${language}.
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*.${lgbtStyle} Focus on setting the mood, deepening sexual interaction between the characters.  This is the stage before sex. Using language: ${language}.
   `;
   const narratorFemaleBodyInteract = `
-    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderOneRolePrompt}'s view.${lgbtStyle} Focus on setting the mood, deepening the relationship, body, or sexual interaction between the characters. Using language: ${language}. Now character${genderOrderOneRolePrompt} says:
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderOneRolePrompt}'s view.${lgbtStyle} Focus on setting the mood, deepening the relationship, body, or sexual interaction between the characters. This is the stage before sex. Using language: ${language}. Now character${genderOrderOneRolePrompt} says:
   `;
   const narratorMaleBodyInteract = `
-    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderTwoRolePrompt}'s view.${lgbtStyle} Focus on setting the mood, deepening the relationship, body, or sexual interaction between the characters. Using language: ${language}. Now character${genderOrderTwoRolePrompt} says:
+    Describe a brief narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderTwoRolePrompt}'s view.${lgbtStyle} Focus on setting the mood, deepening the relationship, body, or sexual interaction between the characters. This is the stage before sex. Using language: ${language}. Now character${genderOrderTwoRolePrompt} says:
   `;
 
   const narratorBeforeOrgasm = `
-    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*. Focus on enjoying the crazy sex with the partner before orgasm. Explicitly describe the sexual organs interaction and feelings. Using language: ${language}.
+    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*. Focus on enjoying the crazy interaction with the partner before orgasm. Explicitly describe the interaction and feelings. **This is the stage before orgasm**. Using language: ${language}.
   `
   const narratorFemaleBeforeOrgasm = `
-    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderOneRolePrompt}'s view.${lgbtStyle} Focus on enjoying the crazy sex with the partner before orgasm. Explicitly describe the sexual interaction and feelings. Using language: ${language}. Now character${genderOrderOneRolePrompt} says:
+    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderOneRolePrompt}'s view.${lgbtStyle} Focus on enjoying the crazy interaction with the partner before orgasm. Explicitly describe the interaction and feelings. **This is the stage before orgasm**. Using language: ${language}. Now character${genderOrderOneRolePrompt} says:
   `;
   const narratorMaleBeforeOrgasm = `
-    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderTwoRolePrompt}'s view.${lgbtStyle} Focus on enjoying the crazy sex with the partner before orgasm. Explicitly describe the sexual interaction and feelings. Using language: ${language}. Now character${genderOrderTwoRolePrompt} says:
+    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderTwoRolePrompt}'s view.${lgbtStyle} Focus on enjoying the crazy interaction with the partner before orgasm. Explicitly describe the interaction and feelings. **This is the stage before orgasm**. Using language: ${language}. Now character${genderOrderTwoRolePrompt} says:
   `;
+
+  const narratorOrgasm = `
+    Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from a *third-party perspective*.${lgbtStyle} Focus on savoring the intense
+    orgasm with your partner. Provide detailed, explicit, and graphic descriptions of the intimate genital connections, capturing the facial expressions, bodily movements, and explicit, filthy talk. Document the wild reactions during the climax for an immersive experience. Using language: ${language}`
 
   const narratorFemaleOrgasm = `
     Describe a detailed narrative outlining the next step interaction between a ${character1Gender}${sameGenderOrderOne} character and a ${character2Gender}${sameGenderOrderTwo} character from character${genderOrderOneRolePrompt}'s view.${lgbtStyle} Focus on savoring the intense orgasm with your partner. Provide detailed, explicit, and graphic descriptions of the intimate genital connections, capturing the facial expressions, bodily movements, and explicit, filthy talk. Document the wild reactions during the climax for an immersive experience. Using language: ${language}. Now character${genderOrderOneRolePrompt} says:
@@ -605,9 +609,9 @@ export default function Home() {
 
   const promptList = [ 
     createFemaleCharacter, createMaleCharacter, scenario,
-    narratorFemale, narratorMale, narrator,
-    narratorFemaleBodyInteract, narratorMaleBodyInteract, narratorBodyInteract,
-    narratorFemaleBeforeOrgasm, narratorMaleBeforeOrgasm, narratorBeforeOrgasm,
+    narratorFemale, narratorMale, narratorBodyInteract,
+    narratorFemaleBodyInteract, narratorMaleBodyInteract, narratorBeforeOrgasm,
+    narratorFemaleBeforeOrgasm, narratorMaleBeforeOrgasm, narratorOrgasm,
     narratorFemaleOrgasm, narratorMaleOrgasm, narratorFinal];
   
 
