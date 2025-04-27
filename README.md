@@ -47,6 +47,14 @@ Visit https://sautoyrs.oopus.info
 - Lucide React for icons
 - js-cookie for cookie management
 
-## AI Model
+## Local AI Model
 
 The application uses the Gemma-2-Ataraxy-9B model from Hugging Face for story generation. The model is loaded and run directly in the browser using WebGPU technology.
+
+## Gemini 2.0 Flash Model
+
+Sautoyrs also supports story generation using Google's Gemini 2.0 Flash API via the [@google/generative-ai](https://www.npmjs.com/package/@google/generative-ai) package. To use this feature:
+
+- Obtain a Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey).
+- Enter your Gemini API key in the "Gemini Token" field in the app settings modal.
+- When a Gemini token is provided, the app will use the Gemini 2.0 Flash model for story generation.
